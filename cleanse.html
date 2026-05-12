@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Other Side - Cleanse Assistant</title>
+    <style>
+        :root {
+            --bg-dark: #000000; 
+            --bg-panel: #1e1e1e; 
+            --bg-btn: #2c2c2c;
+            --text-main: #f4f4f5; 
+            --text-dim: #a1a1aa; 
+            --accent: #10b981; 
+            --warning: #f59e0b; 
+            --danger: #ef4444; 
+            --border: #333333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+
+        header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+        h1 { font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+
+        .difficulty-container { display: flex; gap: 10px; width: 100%; max-width: 1200px; margin-bottom: 20px; flex-wrap: wrap; }
+        .diff-btn {
+            flex: 1; padding: 12px; background: var(--bg-panel); border: 1px solid var(--border); color: #ffffff;
+            font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; transition: 0.2s; min-width: 150px;
+        }
+        .diff-btn:hover { border-color: #555; background: #252525; }
+        .diff-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(16, 185, 129, 0.1); }
+
+        .main-layout { display: flex; gap: 20px; width: 100%; max-width: 1200px; align-items: flex-start; }
+        
+        .col-left { flex: 2; display: flex; flex-direction: column; gap: 20px; min-width: 600px; }
+        .col-right { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 300px; }
+
+        .evidence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+        .evidence-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .ev-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        
+        .visual-btn { background: var(--bg-btn); border: 1px solid var(--border); color: var(--accent); padding: 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-top: auto; width: 100%; transition: 0.2s; font-weight: bold; text-transform: uppercase; }
+        .visual-btn:hover { background: #333; border-color: var(--accent); }
+
+        .level-btn {
+            width: 100%; padding: 12px; margin-bottom: 8px; background: var(--bg-btn); border: 1px solid var(--border);
+            color: #ffffff; cursor: pointer; text-align: left; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: 0.2s;
+        }
+        .level-btn:hover { background: #333; border-color: #555; }
+        .level-btn.selected { border-color: var(--accent); background: rgba(16, 185, 129, 0.15); color: #fff; }
+
+        .terminal-box, .info-box { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); width: 100%; }
+        
+        .terminal-box { background: #0a0a0a; border: 2px solid #444; font-family: 'Consolas', monospace; position: relative; }
+        .terminal-header { color: var(--accent); font-weight: bold; margin-bottom: 10px; text-transform: uppercase; font-family: 'Segoe UI', sans-serif; }
+        .terminal-output { color: #00ff00; white-space: pre-line; line-height: 1.5; font-size: 0.9rem; min-height: 100px; }
+        
+        .penalty-warning { display: none; margin-top: 15px; padding: 10px; background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: #fff; font-size: 0.85rem; border-radius: 4px; font-family: 'Segoe UI', sans-serif; font-weight: bold; text-align: center; }
+        .penalty-warning.active { display: block; animation: pulseRed 2s infinite; }
+
+        .artifact-note-row { display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: bold; padding: 8px 12px; background: var(--bg-btn); border: 1px solid var(--border); border-radius: 4px; margin-bottom: 6px; }
+        .artifact-note-row:last-child { margin-bottom: 0; }
+
+        .reset-btn { width: 100%; padding: 12px; background: var(--bg-btn); border: 1px solid var(--border); color: #ff6b6b; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; transition: 0.2s; }
+        .reset-btn:hover { background: #333; border-color: var(--danger); color: var(--danger); }
+
+        .info-box h3 { font-size: 1.1rem; color: var(--accent); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; text-transform: uppercase; }
+        
+        .fieldnotes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .rules-content { font-size: 0.78rem; color: var(--text-main); line-height: 1.4; list-style-type: none; padding-left: 0; margin-bottom: 0; }
+        .rules-content li { margin-bottom: 6px; padding-left: 12px; position: relative; }
+        .rules-content li::before { content: "•"; color: var(--accent); position: absolute; left: 0; font-weight: bold; }
+        .rules-category { color: var(--warning); font-weight: bold; font-size: 0.75rem; text-transform: uppercase; display: block; margin-top: 8px; margin-bottom: 4px; }
+        .rules-category:first-child { margin-top: 0; }
+
+        .phrase-grid { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+        .phrase-tag { background: var(--bg-btn); border: 1px solid #444; color: var(--text-dim); font-size: 0.75rem; padding: 4px 6px; border-radius: 4px; font-family: 'Consolas', monospace; user-select: text; }
+
+        .footer-link { font-size: 0.7rem; color: #ffffff; text-align: center; margin-top: 5px; margin-bottom: 5px; }
+        .footer-link a { color: var(--accent); text-decoration: none; font-weight: bold; }
+        .footer-link a:hover { text-decoration: underline; }
+        .footer-container { margin-top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        /* Modal Gallery Styles */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 50px; overflow-y: auto; }
+        .modal.active { display: flex; }
+        .close-modal { position: fixed; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; z-index: 101; }
+        .close-modal:hover { color: var(--danger); }
+        
+        .modal-content-container { width: 90%; max-width: 1000px; margin-bottom: 50px; }
+        .modal-title { color: var(--accent); font-size: 2rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--border); padding-bottom: 10px; }
+        
+        .gallery-level-section { margin-bottom: 40px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+        .gallery-level-title { font-size: 1.2rem; color: #fff; margin-bottom: 15px; font-weight: bold; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; justify-items: center; }
+        .gallery-img { width: 100%; max-width: 160px; height: auto; border: 1px solid #444; border-radius: 4px; object-fit: cover; }
+
+        @media (max-width: 950px) {
+            .main-layout { display: flex; flex-direction: column; }
+            .col-left, .col-right { display: contents; }
+            .box-terminal { order: 1; }
+            .box-evidence { order: 2; }
+            .box-artifacts { order: 3; }
+            .box-phrases { order: 4; }
+            .box-fieldnotes { order: 5; }
+            .box-reset { order: 6; }
+        }
+
+        @media (max-width: 768px) {
+            .evidence-grid { grid-template-columns: repeat(2, 1fr); }
+            .fieldnotes-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 500px) {
+            .evidence-grid { grid-template-columns: 1fr; }
+        }
+
+        @keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 10px 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Spectral Affixer Terminal</h1>
+    </header>
+
+    <div class="difficulty-container" id="diffContainer"></div>
+
+    <div class="main-layout">
+        
+        <div class="col-left">
+            <div class="box-evidence evidence-grid" id="evidenceGrid"></div>
+            
+            <div class="box-fieldnotes info-box">
+                <h3>Field Notes</h3>
+                <div class="fieldnotes-grid">
+                    <div>
+                        <span class="rules-category">Investigation & Evidence</span>
+                        <ul class="rules-content">
+                            <li>Goal: Find the ghost's characteristics (the highest evidence level for each type), not a ghost "type".</li>
+                            <li>Listen for interactions anywhere; scan the item the ghost interacted with to find evidence.</li>
+                            <li>Evidence can spawn anywhere, but becomes more common in the favorite room over time.</li>
+                            <li>Favorite room will drop to the lowest temperature. Do not mistake cold spot evidence for base room temp.</li>
+                            <li>Placing a Sanctified Cross in the favorite room may trigger an interaction (not guaranteed).</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="rules-category">Affixer & Cleansing</span>
+                        <ul class="rules-content">
+                            <li>Input only the HIGHEST level of evidence found into the Affixer.</li>
+                            <li>Novice/Int: Extra incorrect entries don't matter as long as the minimum required are correct.</li>
+                            <li>Expert/Master: Incorrect entries instantly trigger a hunt. Only input verified characteristics.</li>
+                            <li>E.A.L. (Buzz-Stick): Use after a successful scan. It glows brighter when close to an artifact, and flashes when very close.</li>
+                            <li>Completion: Find all artifacts to cleanse the ghost. Or, take the Optional Exit after a successful scan for a partial reward.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-right">
+            <div class="box-terminal terminal-box">
+                <div class="terminal-header">Input Commands</div>
+                <div class="terminal-output" id="terminalOutput">> Awaiting data input...</div>
+                <div class="penalty-warning" id="penaltyWarning">CRITICAL: Too many characteristics selected! Expert/Master penalizes incorrect inputs. Reduce to minimum required.</div>
+            </div>
+
+            <div class="box-artifacts info-box">
+                <h3>Artifact Spawns</h3>
+                <div class="artifact-note-row">
+                    <span style="color: var(--text-dim);">Novice</span> <span style="color: var(--accent);">2 Artifacts</span>
+                </div>
+                <div class="artifact-note-row">
+                    <span style="color: var(--text-dim);">Intermediate</span> <span style="color: var(--accent);">3 Artifacts</span>
+                </div>
+                <div class="artifact-note-row">
+                    <span style="color: var(--text-dim);">Expert</span> <span style="color: var(--warning);">6 Artifacts</span>
+                </div>
+                <div class="artifact-note-row">
+                    <span style="color: var(--text-dim);">Master</span> <span style="color: var(--danger);">10 Artifacts</span>
+                </div>
+            </div>
+
+            <div class="box-phrases info-box">
+                <h3>Spirit Box Phrases</h3>
+                <div class="phrase-grid">
+                    <span class="phrase-tag">HELLO</span> <span class="phrase-tag">WHO'S THERE</span> <span class="phrase-tag">REVEAL YOURSELF</span> 
+                    <span class="phrase-tag">MAKE A SOUND</span> <span class="phrase-tag">TALK NOW</span> <span class="phrase-tag">HEAR US</span> 
+                    <span class="phrase-tag">SHOW STRENGTH</span> <span class="phrase-tag">MAKE NOISE</span> <span class="phrase-tag">FOLLOW US</span> 
+                    <span class="phrase-tag">BE SEEN</span> <span class="phrase-tag">WE SEE YOU</span> <span class="phrase-tag">ARE YOU ANGRY</span> 
+                    <span class="phrase-tag">MANIFEST</span> <span class="phrase-tag">KNOCK ONCE</span> <span class="phrase-tag">TOUCH THIS</span> 
+                    <span class="phrase-tag">WHERE ARE YOU</span> <span class="phrase-tag">ARE YOU FRIENDLY</span> <span class="phrase-tag">HOW OLD ARE YOU</span> 
+                    <span class="phrase-tag">HOW DID YOU DIE</span> <span class="phrase-tag">ARE YOU HERE</span> <span class="phrase-tag">GIVE US A SIGN</span> 
+                    <span class="phrase-tag">ARE YOU CLOSE</span> <span class="phrase-tag">SPEAK TO US</span> <span class="phrase-tag">CAN YOU TALK</span> 
+                    <span class="phrase-tag">WHAT IS YOUR LOCATION</span> <span class="phrase-tag">IS THERE A GHOST HERE</span> <span class="phrase-tag">ARE YOU YOUNG</span> 
+                    <span class="phrase-tag">ARE YOU OLD</span> <span class="phrase-tag">WHAT DO YOU WANT</span> <span class="phrase-tag">WHY ARE YOU HERE</span> 
+                    <span class="phrase-tag">DO YOU WANT TO HURT US</span> <span class="phrase-tag">DO YOU WANT US HERE</span> <span class="phrase-tag">SHALL WE LEAVE</span> 
+                    <span class="phrase-tag">SHOULD WE LEAVE</span> <span class="phrase-tag">DO SOMETHING</span> <span class="phrase-tag">IS THIS YOUR HOME</span> 
+                    <span class="phrase-tag">IS THERE ANYONE HERE</span> <span class="phrase-tag">MAKE A NOISE</span>
+                </div>
+            </div>
+
+            <button class="box-reset reset-btn" onclick="resetAll()">Reset Terminal</button>
+        </div>
+    </div>
+
+    <div class="footer-container">
+        <div class="footer-link">Unofficial <a href="https://theotherside-game.fandom.com/wiki/The_Other_Side_Wiki" target="_blank">Wiki</a> - Created by nena</div>
+        <div class="footer-link">Unofficial Cleanse Assistant - Created by <a href="https://linktr.ee/p8riot" target="_blank">p8riot</a></div>
+    </div>
+
+    <div id="imageModal" class="modal" onclick="closeModal(event)">
+        <span class="close-modal" onclick="closeModal(event)">×</span>
+        <div class="modal-content-container">
+            <div class="modal-title" id="modalTitle">Visual Reference</div>
+            <div id="modalGalleryContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const config = {
+            "Novice": { req: 2, penalty: false },
+            "Intermediate": { req: 3, penalty: false },
+            "Expert": { req: 4, penalty: true },
+            "Master": { req: 5, penalty: true }
+        };
+
+        const evidenceData = {
+            "EMF": [
+                { l: 1, text: "Weak Anomalies (1.5 to 2.49\u00A0mG)" },
+                { l: 2, text: "Moderate Disturbances (2.5 to 9.99\u00A0mG)" },
+                { l: 3, text: "Strong Emissions (10 to 19.99\u00A0mG)" },
+                { l: 4, text: "Overwhelming Fields (20+\u00A0mG)" }
+            ],
+            "Thermal": [
+                { l: 1, text: "Mild (0.1 to 4.4\u00A0C | 32.2 to 39.9\u00A0F)" },
+                { l: 2, text: "Moderate (-9.9 to 0.0\u00A0C | 14.2 to 32.0\u00A0F)" },
+                { l: 3, text: "Significant (-13.7 to -10.0\u00A0C | 7.3 to 14.0\u00A0F)" },
+                { l: 4, text: "Frigid (-20.5 to -13.8\u00A0C | -4.9 to 7.2\u00A0F)" }
+            ],
+            "Radiation": [
+                { l: 1, text: "Minimal (100 to 500\u00A0CPM)" },
+                { l: 2, text: "Moderate (501 to 1000\u00A0CPM)" },
+                { l: 3, text: "Intense (1001 to 2000\u00A0CPM)" }
+            ],
+            "UV": [
+                { l: 1, text: "Faint Traces (Spray/Splotches)" },
+                { l: 2, text: "Moderate Residues (Glowing Puddles)" },
+                { l: 3, text: "Easily Identifiable Patterns (Clear Handprints)" }
+            ],
+            "Audio": [
+                { l: 1, text: "Unintelligible Sounds" },
+                { l: 2, text: "Single Word Responses" },
+                { l: 3, text: "Intelligible Phrases" }
+            ],
+            "Writing": [
+                { l: 1, text: "Incomprehensible Scribbling (Chaotic)" },
+                { l: 2, text: "Symbolic Enigmas (Shapes/Stars)" },
+                { l: 3, text: "Hostile Manifestations (Threatening Words)" }
+            ]
+        };
+
+        const imageLibrary = {
+            "UV": {
+                "Level 1: Faint Traces": ["UV_1.webp", "UV_1.1.webp", "UV_1.2.webp", "UV_1.3.webp"],
+                "Level 2: Moderate Residues": ["UV_2.webp", "UV_2.1.webp", "UV_2.2.webp", "UV_2.3.webp"],
+                "Level 3: Easily Identifiable Patterns": ["UV_3.webp", "UV_3.1.webp", "UV_3.2.webp", "UV_3.3.webp"]
+            },
+            "Writing": {
+                "Level 1: Incomprehensible Scribbling": ["Writing_1.webp", "Writing_1.1.webp", "Writing_1.2.webp"],
+                "Level 2: Symbolic Enigmas": ["Writing_2.webp", "Writing_2.1.webp", "Writing_2.2.webp", "Writing_2.3.webp", "Writing_2.4.webp"],
+                "Level 3: Hostile Manifestations": ["Writing_3.webp", "Writing_3.1.webp"]
+            }
+        };
+
+        let currentDiff = "Master";
+        let selectedEvidence = {};
+
+        function init() {
+            renderDifficulty();
+            renderEvidence();
+            updateTerminal();
+        }
+
+        function renderDifficulty() {
+            const container = document.getElementById('diffContainer');
+            container.innerHTML = "";
+            Object.keys(config).forEach(diff => {
+                const btn = document.createElement('button');
+                btn.className = `diff-btn ${diff === currentDiff ? 'active' : ''}`;
+                btn.innerText = `${diff} (${config[diff].req} Req)`;
+                btn.onclick = () => { currentDiff = diff; init(); };
+                container.appendChild(btn);
+            });
+        }
+
+        function renderEvidence() {
+            const grid = document.getElementById('evidenceGrid');
+            grid.innerHTML = "";
+            
+            Object.entries(evidenceData).forEach(([type, levels]) => {
+                const card = document.createElement('div');
+                card.className = 'evidence-card';
+                card.innerHTML = `<div class="ev-title">${type}</div>`;
+
+                levels.forEach(lvl => {
+                    const btn = document.createElement('button');
+                    const isSelected = selectedEvidence[type] === lvl.l;
+                    btn.className = `level-btn ${isSelected ? 'selected' : ''}`;
+                    btn.innerText = `Level ${lvl.l}: ${lvl.text}`;
+                    btn.onclick = () => selectEvidence(type, lvl.l);
+                    card.appendChild(btn);
+                });
+
+                if (type === "UV" || type === "Writing") {
+                    const visBtn = document.createElement('button');
+                    visBtn.className = 'visual-btn';
+                    visBtn.innerText = `View ${type} Reference`;
+                    visBtn.onclick = () => openModal(type);
+                    card.appendChild(visBtn);
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        function selectEvidence(type, level) {
+            if (selectedEvidence[type] === level) {
+                delete selectedEvidence[type];
+            } else {
+                selectedEvidence[type] = level;
+            }
+            renderEvidence();
+            updateTerminal();
+        }
+
+        function updateTerminal() {
+            const output = document.getElementById('terminalOutput');
+            const warning = document.getElementById('penaltyWarning');
+            const req = config[currentDiff].req;
+            const penalty = config[currentDiff].penalty;
+            
+            const entries = Object.entries(selectedEvidence);
+            if (entries.length === 0) {
+                output.innerHTML = `> Awaiting data input...\n> Minimum required: ${req}`;
+                warning.classList.remove('active');
+                return;
+            }
+
+            let text = "";
+            entries.forEach(([type, lvl]) => { text += `> ADD ${type.toUpperCase()} ${lvl}\n`; });
+            
+            if (entries.length < req) {
+                text += `\n[System] Need ${req - entries.length} more characteristic(s) to scan.`;
+            } else {
+                text += `\n> Type SCAN in terminal.`;
+            }
+
+            output.innerHTML = text;
+
+            if (penalty && entries.length > req) warning.classList.add('active');
+            else warning.classList.remove('active');
+        }
+
+        function resetAll() {
+            selectedEvidence = {};
+            init();
+        }
+
+        function openModal(type) {
+            const modal = document.getElementById('imageModal');
+            const title = document.getElementById('modalTitle');
+            const container = document.getElementById('modalGalleryContainer');
+            
+            title.innerText = `${type} Evidence Protocol`;
+            container.innerHTML = "";
+
+            const data = imageLibrary[type];
+            if(data) {
+                Object.entries(data).forEach(([levelName, images]) => {
+                    const section = document.createElement('div');
+                    section.className = 'gallery-level-section';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'gallery-level-title';
+                    header.innerText = levelName;
+                    section.appendChild(header);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'gallery-grid';
+
+                    images.forEach(imgSrc => {
+                        const img = document.createElement('img');
+                        img.src = imgSrc;
+                        img.className = 'gallery-img';
+                        grid.appendChild(img);
+                    });
+
+                    section.appendChild(grid);
+                    container.appendChild(section);
+                });
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'imageModal' || e.target.classList.contains('close-modal')) {
+                document.getElementById('imageModal').classList.remove('active');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
