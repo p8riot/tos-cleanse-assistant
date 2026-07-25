@@ -107,7 +107,8 @@
             .box-evidence { order: 2; }
             .box-artifacts { order: 3; }
             .box-phrases { order: 4; }
-            .box-fieldnotes { order: 5; }
+            .box-mappicker { order: 5; }
+            .box-fieldnotes { order: 6; }
         }
 
         @media (max-width: 768px) {
@@ -206,42 +207,53 @@
                 <h3>Spirit Box Phrases</h3>
                 <div class="phrase-grid">
                     <span class="phrase-tag">HELLO</span>
-                        <span class="phrase-tag">BE SEEN</span>
-                        <span class="phrase-tag">HEAR US</span>
-                        <span class="phrase-tag">MANIFEST</span>
-                        <span class="phrase-tag">TALK NOW</span>
-                        <span class="phrase-tag">KNOCK ONCE</span>
-                        <span class="phrase-tag">MAKE NOISE</span>
-                        <span class="phrase-tag">TOUCH THIS</span>
-                        <span class="phrase-tag">WE SEE YOU</span>
-                        <span class="phrase-tag">ARE YOU OLD</span>
-                        <span class="phrase-tag">SPEAK TO US</span>
-                        <span class="phrase-tag">WHO'S THERE</span>
-                        <span class="phrase-tag">ARE YOU HERE</span>
-                        <span class="phrase-tag">CAN YOU TALK</span>
-                        <span class="phrase-tag">DO SOMETHING</span>
-                        <span class="phrase-tag">MAKE A SOUND</span>
-                        <span class="phrase-tag">ARE YOU ANGRY</span>
-                        <span class="phrase-tag">ARE YOU CLOSE</span>
-                        <span class="phrase-tag">ARE YOU YOUNG</span>
-                        <span class="phrase-tag">SHOW STRENGTH</span>
-                        <span class="phrase-tag">WHERE ARE YOU</span>
-                        <span class="phrase-tag">SHALL WE LEAVE</span>
-                        <span class="phrase-tag">GIVE US A SIGN</span>
-                        <span class="phrase-tag">HOW DID YOU DIE</span>
-                        <span class="phrase-tag">HOW OLD ARE YOU</span>
-                        <span class="phrase-tag">REVEAL YOURSELF</span>
-                        <span class="phrase-tag">SHOULD WE LEAVE</span>
-                        <span class="phrase-tag">ARE YOU FRIENDLY</span>
-                        <span class="phrase-tag">WHAT DO YOU WANT</span>
-                        <span class="phrase-tag">WHY ARE YOU HERE</span>
-                        <span class="phrase-tag">IS THIS YOUR HOME</span>
-                        <span class="phrase-tag">DO YOU WANT US HERE</span>
-                        <span class="phrase-tag">IS THERE ANYONE HERE</span>
-                        <span class="phrase-tag">IS THERE A GHOST HERE</span>
-                        <span class="phrase-tag">WHAT IS YOUR LOCATION</span>
-                        <span class="phrase-tag">DO YOU WANT TO HURT US</span>
+                    <span class="phrase-tag">BE SEEN</span>
+                    <span class="phrase-tag">HEAR US</span>
+                    <span class="phrase-tag">MANIFEST</span>
+                    <span class="phrase-tag">TALK NOW</span>
+                    <span class="phrase-tag">KNOCK ONCE</span>
+                    <span class="phrase-tag">MAKE NOISE</span>
+                    <span class="phrase-tag">TOUCH THIS</span>
+                    <span class="phrase-tag">WE SEE YOU</span>
+                    <span class="phrase-tag">ARE YOU OLD</span>
+                    <span class="phrase-tag">SPEAK TO US</span>
+                    <span class="phrase-tag">WHO'S THERE</span>
+                    <span class="phrase-tag">ARE YOU HERE</span>
+                    <span class="phrase-tag">CAN YOU TALK</span>
+                    <span class="phrase-tag">DO SOMETHING</span>
+                    <span class="phrase-tag">MAKE A SOUND</span>
+                    <span class="phrase-tag">ARE YOU ANGRY</span>
+                    <span class="phrase-tag">ARE YOU CLOSE</span>
+                    <span class="phrase-tag">ARE YOU YOUNG</span>
+                    <span class="phrase-tag">SHOW STRENGTH</span>
+                    <span class="phrase-tag">WHERE ARE YOU</span>
+                    <span class="phrase-tag">SHALL WE LEAVE</span>
+                    <span class="phrase-tag">GIVE US A SIGN</span>
+                    <span class="phrase-tag">HOW DID YOU DIE</span>
+                    <span class="phrase-tag">HOW OLD ARE YOU</span>
+                    <span class="phrase-tag">REVEAL YOURSELF</span>
+                    <span class="phrase-tag">SHOULD WE LEAVE</span>
+                    <span class="phrase-tag">ARE YOU FRIENDLY</span>
+                    <span class="phrase-tag">WHAT DO YOU WANT</span>
+                    <span class="phrase-tag">WHY ARE YOU HERE</span>
+                    <span class="phrase-tag">IS THIS YOUR HOME</span>
+                    <span class="phrase-tag">DO YOU WANT US HERE</span>
+                    <span class="phrase-tag">IS THERE ANYONE HERE</span>
+                    <span class="phrase-tag">IS THERE A GHOST HERE</span>
+                    <span class="phrase-tag">WHAT IS YOUR LOCATION</span>
+                    <span class="phrase-tag">DO YOU WANT TO HURT US</span>
                 </div>
+            </div>
+
+            <!-- MAP PICKER WHEEL BOX -->
+            <div class="box-mappicker info-box" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <h3 style="width: 100%; text-align: left;">Map Picker</h3>
+                <div style="position: relative; margin: 15px 0; width: 100%; display: flex; justify-content: center;">
+                    <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 15px solid var(--accent); z-index: 5;"></div>
+                    <canvas id="wheelCanvas" width="280" height="280" style="max-width: 100%; height: auto; border-radius: 50%; border: 1px solid var(--border); background: #121212;"></canvas>
+                </div>
+                <button class="visual-btn" onclick="spinWheel()" style="margin-top: 5px;">Spin Wheel</button>
+                <div id="wheelResult" style="margin-top: 10px; font-size: 1rem; font-weight: bold; color: var(--accent); min-height: 24px;"></div>
             </div>
         </div>
     </div>
@@ -315,6 +327,34 @@
             }
         };
 
+        /* MAP PICKER DATA */
+        const mapList = [
+            "St. Joseph's Orphanage",
+            "Abaddon Hallows West",
+            "Abaddon Hallows East",
+            "Abaddon Hallows East (P)",
+            "Summerhill Psychiatric",
+            "Stone Manor Plantation",
+            "317 Aspen Heights",
+            "1205 Cedar Street",
+            "12 Ravenwood Lane"
+        ];
+
+        const mapTextColors = [
+            "#ff4444", // Red
+            "#ffa500", // Orange
+            "#ffd700", // Yellow
+            "#32cd32", // Green
+            "#00ffff", // Cyan
+            "#44aaff", // Blue
+            "#bc13fe", // Purple
+            "#ff66cc", // Pink
+            "#4ecdc4"  // Teal
+        ];
+
+        let currentWheelAngle = 0;
+        let isSpinning = false;
+
         let currentDiff = "Master";
         let selectedEvidence = {};
 
@@ -322,6 +362,89 @@
             renderDifficulty();
             renderEvidence();
             updateTerminal();
+            drawWheel();
+        }
+
+        /* WHEEL FUNCTIONS */
+        function drawWheel() {
+            const canvas = document.getElementById('wheelCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const numSlices = mapList.length;
+            if (numSlices === 0) return;
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2 - 5;
+            const sliceAngle = (2 * Math.PI) / numSlices;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const sliceColors = ['#2c2c2c', '#1e1e1e', '#383838', '#222222'];
+
+            for (let i = 0; i < numSlices; i++) {
+                const startAngle = currentWheelAngle + (i * sliceAngle);
+                const endAngle = startAngle + sliceAngle;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = sliceColors[i % sliceColors.length];
+                ctx.fill();
+                ctx.strokeStyle = '#333';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(startAngle + sliceAngle / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = mapTextColors[i % mapTextColors.length];
+                ctx.font = "bold 10px 'Segoe UI', sans-serif";
+                ctx.fillText(mapList[i], radius - 10, 3);
+                ctx.restore();
+            }
+        }
+
+        function spinWheel() {
+            if (isSpinning || mapList.length === 0) return;
+            isSpinning = true;
+            document.getElementById('wheelResult').innerText = "Selecting location...";
+
+            const totalRotation = (Math.random() * 12 + 18) * Math.PI; 
+            const duration = Math.random() * 2000 + 3000;
+            const startTimestamp = performance.now();
+
+            function animate(now) {
+                const elapsed = now - startTimestamp;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const easeOut = 1 - Math.pow(1 - progress, 4);
+                currentWheelAngle = (easeOut * totalRotation) % (2 * Math.PI);
+
+                drawWheel();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    isSpinning = false;
+                    calculateWheelWinner();
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        function calculateWheelWinner() {
+            const numSlices = mapList.length;
+            const sliceAngle = (2 * Math.PI) / numSlices;
+
+            let pointerAngle = (3 * Math.PI / 2 - currentWheelAngle) % (2 * Math.PI);
+            if (pointerAngle < 0) pointerAngle += 2 * Math.PI;
+
+            const winningIndex = Math.floor(pointerAngle / sliceAngle) % numSlices;
+            document.getElementById('wheelResult').innerText = `Destination: ${mapList[winningIndex]}`;
         }
 
         function renderDifficulty() {
