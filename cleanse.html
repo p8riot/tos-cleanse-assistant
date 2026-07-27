@@ -84,7 +84,6 @@
         .footer-link a:hover { text-decoration: underline; }
         .footer-container { margin-top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-        /* Modal Gallery Styles */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 50px; overflow-y: auto; }
         .modal.active { display: flex; }
         .close-modal { position: fixed; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; z-index: 101; }
@@ -245,7 +244,6 @@
                 </div>
             </div>
 
-            <!-- MAP PICKER WHEEL BOX -->
             <div class="box-mappicker info-box" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                 <h3 style="width: 100%; text-align: left;">Map Picker</h3>
                 <div style="position: relative; margin: 15px 0; width: 100%; display: flex; justify-content: center;">
@@ -272,91 +270,100 @@
     </div>
 
     <script>
-        const config = {
-            "Novice": { req: 2 },
-            "Intermediate": { req: 3 },
-            "Expert": { req: 4 },
-            "Master": { req: 5 }
+        const difficultyRequirements = {
+            Novice: 2,
+            Intermediate: 3,
+            Expert: 4,
+            Master: 5
         };
 
         const evidenceData = {
-            "EMF": [
-                { l: 1, text: "Weak Anomalies (1.5 to 2.49\u00A0mG)" },
-                { l: 2, text: "Moderate Disturbances (2.5 to 9.99\u00A0mG)" },
-                { l: 3, text: "Strong Emissions (10 to 19.99\u00A0mG)" },
-                { l: 4, text: "Overwhelming Fields (20+\u00A0mG)" }
+            EMF: [
+                { level: 1, text: "Weak Anomalies (1.5 to 2.49\u00A0mG)" },
+                { level: 2, text: "Moderate Disturbances (2.5 to 9.99\u00A0mG)" },
+                { level: 3, text: "Strong Emissions (10 to 19.99\u00A0mG)" },
+                { level: 4, text: "Overwhelming Fields (20+\u00A0mG)" }
             ],
-            "Thermal": [
-                { l: 1, text: "Mild (0.1 to 4.4\u00A0C | 32.2 to 39.9\u00A0F)" },
-                { l: 2, text: "Moderate (-9.9 to 0.0\u00A0C | 14.2 to 32.0\u00A0F)" },
-                { l: 3, text: "Significant (-13.7 to -10.0\u00A0C | 7.3 to 14.0\u00A0F)" },
-                { l: 4, text: "Frigid (-20.5 to -13.8\u00A0C | -4.9 to 7.2\u00A0F)" }
+            Thermal: [
+                { level: 1, text: "Mild (0.1 to 4.4\u00A0C | 32.2 to 39.9\u00A0F)" },
+                { level: 2, text: "Moderate (-9.9 to 0.0\u00A0C | 14.2 to 32.0\u00A0F)" },
+                { level: 3, text: "Significant (-13.7 to -10.0\u00A0C | 7.3 to 14.0\u00A0F)" },
+                { level: 4, text: "Frigid (-20.5 to -13.8\u00A0C | -4.9 to 7.2\u00A0F)" }
             ],
-            "Radiation": [
-                { l: 1, text: "Minimal (100 to 500\u00A0CPM)" },
-                { l: 2, text: "Moderate (501 to 1000\u00A0CPM)" },
-                { l: 3, text: "Intense (1001 to 2000\u00A0CPM)" }
+            Radiation: [
+                { level: 1, text: "Minimal (100 to 500\u00A0CPM)" },
+                { level: 2, text: "Moderate (501 to 1000\u00A0CPM)" },
+                { level: 3, text: "Intense (1001 to 2000\u00A0CPM)" }
             ],
-            "UV": [
-                { l: 1, text: "Faint Traces (Spray/Splotches)" },
-                { l: 2, text: "Moderate Residues (Glowing Puddles)" },
-                { l: 3, text: "Easily Identifiable Patterns (Clear Handprints)" }
+            UV: [
+                { level: 1, text: "Faint Traces (Spray/Splotches)" },
+                { level: 2, text: "Moderate Residues (Glowing Puddles)" },
+                { level: 3, text: "Easily Identifiable Patterns (Clear Handprints)" }
             ],
-            "Audio": [
-                { l: 1, text: "Unintelligible Sounds" },
-                { l: 2, text: "Single Word Responses" },
-                { l: 3, text: "Intelligible Phrases" }
+            Audio: [
+                { level: 1, text: "Unintelligible Sounds" },
+                { level: 2, text: "Single Word Responses" },
+                { level: 3, text: "Intelligible Phrases" }
             ],
-            "Writing": [
-                { l: 1, text: "Incomprehensible Scribbling (Chaotic)" },
-                { l: 2, text: "Symbolic Enigmas (Shapes/Stars)" },
-                { l: 3, text: "Hostile Manifestations (Threatening Words)" }
+            Writing: [
+                { level: 1, text: "Incomprehensible Scribbling (Chaotic)" },
+                { level: 2, text: "Symbolic Enigmas (Shapes/Stars)" },
+                { level: 3, text: "Hostile Manifestations (Threatening Words)" }
             ]
         };
 
         const imageLibrary = {
-            "UV": {
+            UV: {
                 "Level 1: Faint Traces": ["UV_1.webp", "UV_1.1.webp", "UV_1.2.webp", "UV_1.3.webp"],
                 "Level 2: Moderate Residues": ["UV_2.webp", "UV_2.1.webp", "UV_2.2.webp", "UV_2.3.webp"],
                 "Level 3: Easily Identifiable Patterns": ["UV_3.webp", "UV_3.1.webp", "UV_3.2.webp"]
             },
-            "Writing": {
+            Writing: {
                 "Level 1: Incomprehensible Scribbling": ["Writing_1.webp", "Writing_1.1.webp", "Writing_1.2.webp"],
                 "Level 2: Symbolic Enigmas": ["Writing_2.webp", "Writing_2.1.webp", "Writing_2.2.webp", "Writing_2.3.webp", "Writing_2.4.webp"],
                 "Level 3: Hostile Manifestations": ["Writing_3.webp", "Writing_3.1.webp"]
             }
         };
 
-        /* MAP PICKER DATA */
-        const mapList = [
-            "St. Joseph's Orphanage",
-            "Abaddon Hallows West",
-            "Abaddon Hallows East",
-            "Abaddon Hallows East (P)",
-            "Summerhill Psychiatric",
-            "Stone Manor Plantation",
-            "317 Aspen Heights",
-            "1205 Cedar Street",
-            "12 Ravenwood Lane"
-        ];
-
-        const mapTextColors = [
-            "#ff4444", // Red
-            "#ffa500", // Orange
-            "#ffd700", // Yellow
-            "#32cd32", // Green
-            "#00ffff", // Cyan
-            "#44aaff", // Blue
-            "#bc13fe", // Purple
-            "#ff66cc", // Pink
-            "#4ecdc4"  // Teal
-        ];
+        const wheelData = {
+            maps: [
+                "St. Joseph's Orphanage",
+                "Abaddon Hallows West",
+                "Abaddon Hallows East",
+                "Abaddon Hallows East (P)",
+                "Summerhill Psychiatric",
+                "Stone Manor Plantation",
+                "317 Aspen Heights",
+                "1205 Cedar Street",
+                "12 Ravenwood Lane"
+            ],
+            textColors: [
+                "#ff4444",
+                "#ffa500",
+                "#ffd700",
+                "#32cd32",
+                "#00ffff",
+                "#44aaff",
+                "#bc13fe",
+                "#ff66cc",
+                "#4ecdc4"
+            ],
+            sliceColors: ["#2c2c2c", "#1e1e1e", "#383838", "#222222"]
+        };
 
         let currentWheelAngle = 0;
         let isSpinning = false;
-
-        let currentDiff = "Master";
+        let currentDifficulty = "Master";
         let selectedEvidence = {};
+
+        function createElement(tagName, className, text, onClick) {
+            const element = document.createElement(tagName);
+            if (className) element.className = className;
+            if (text !== undefined) element.textContent = text;
+            if (tagName === "button") element.type = "button";
+            if (onClick) element.addEventListener("click", onClick);
+            return element;
+        }
 
         function init() {
             renderDifficulty();
@@ -365,124 +372,132 @@
             drawWheel();
         }
 
-        /* WHEEL FUNCTIONS */
         function drawWheel() {
-            const canvas = document.getElementById('wheelCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const numSlices = mapList.length;
-            if (numSlices === 0) return;
+            const canvas = document.getElementById("wheelCanvas");
+            if (!canvas || wheelData.maps.length === 0) return;
 
+            const context = canvas.getContext("2d");
+            const sliceCount = wheelData.maps.length;
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const radius = canvas.width / 2 - 5;
-            const sliceAngle = (2 * Math.PI) / numSlices;
+            const sliceAngle = (2 * Math.PI) / sliceCount;
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            context.clearRect(0, 0, canvas.width, canvas.height);
 
-            const sliceColors = ['#2c2c2c', '#1e1e1e', '#383838', '#222222'];
-
-            for (let i = 0; i < numSlices; i++) {
-                const startAngle = currentWheelAngle + (i * sliceAngle);
+            wheelData.maps.forEach((mapName, index) => {
+                const startAngle = currentWheelAngle + index * sliceAngle;
                 const endAngle = startAngle + sliceAngle;
 
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = sliceColors[i % sliceColors.length];
-                ctx.fill();
-                ctx.strokeStyle = '#333';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
+                context.beginPath();
+                context.moveTo(centerX, centerY);
+                context.arc(centerX, centerY, radius, startAngle, endAngle);
+                context.closePath();
+                context.fillStyle = wheelData.sliceColors[index % wheelData.sliceColors.length];
+                context.fill();
+                context.strokeStyle = "#333";
+                context.lineWidth = 1.5;
+                context.stroke();
 
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(startAngle + sliceAngle / 2);
-                ctx.textAlign = "right";
-                ctx.fillStyle = mapTextColors[i % mapTextColors.length];
-                ctx.font = "bold 10px 'Segoe UI', sans-serif";
-                ctx.fillText(mapList[i], radius - 10, 3);
-                ctx.restore();
-            }
+                context.save();
+                context.translate(centerX, centerY);
+                context.rotate(startAngle + sliceAngle / 2);
+                context.textAlign = "right";
+                context.fillStyle = wheelData.textColors[index % wheelData.textColors.length];
+                context.font = "bold 10px 'Segoe UI', sans-serif";
+                context.fillText(mapName, radius - 10, 3);
+                context.restore();
+            });
         }
 
         function spinWheel() {
-            if (isSpinning || mapList.length === 0) return;
-            isSpinning = true;
-            document.getElementById('wheelResult').innerText = "Selecting location...";
+            if (isSpinning || wheelData.maps.length === 0) return;
 
-            const totalRotation = (Math.random() * 12 + 18) * Math.PI; 
+            isSpinning = true;
+            document.getElementById("wheelResult").textContent = "Selecting location...";
+
+            const totalRotation = (Math.random() * 12 + 18) * Math.PI;
             const duration = Math.random() * 2000 + 3000;
             const startTimestamp = performance.now();
 
             function animate(now) {
                 const elapsed = now - startTimestamp;
                 const progress = Math.min(elapsed / duration, 1);
-                
                 const easeOut = 1 - Math.pow(1 - progress, 4);
-                currentWheelAngle = (easeOut * totalRotation) % (2 * Math.PI);
 
+                currentWheelAngle = (easeOut * totalRotation) % (2 * Math.PI);
                 drawWheel();
 
                 if (progress < 1) {
                     requestAnimationFrame(animate);
-                } else {
-                    isSpinning = false;
-                    calculateWheelWinner();
+                    return;
                 }
+
+                isSpinning = false;
+                calculateWheelWinner();
             }
 
             requestAnimationFrame(animate);
         }
 
         function calculateWheelWinner() {
-            const numSlices = mapList.length;
-            const sliceAngle = (2 * Math.PI) / numSlices;
-
+            const sliceAngle = (2 * Math.PI) / wheelData.maps.length;
             let pointerAngle = (3 * Math.PI / 2 - currentWheelAngle) % (2 * Math.PI);
+
             if (pointerAngle < 0) pointerAngle += 2 * Math.PI;
 
-            const winningIndex = Math.floor(pointerAngle / sliceAngle) % numSlices;
-            document.getElementById('wheelResult').innerText = `Destination: ${mapList[winningIndex]}`;
+            const winningIndex = Math.floor(pointerAngle / sliceAngle) % wheelData.maps.length;
+            document.getElementById("wheelResult").textContent = `Destination: ${wheelData.maps[winningIndex]}`;
+        }
+
+        function setDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            init();
         }
 
         function renderDifficulty() {
-            const container = document.getElementById('diffContainer');
-            container.innerHTML = "";
-            Object.keys(config).forEach(diff => {
-                const btn = document.createElement('button');
-                btn.className = `diff-btn ${diff === currentDiff ? 'active' : ''}`;
-                btn.innerText = `${diff} (${config[diff].req} Req)`;
-                btn.onclick = () => { currentDiff = diff; init(); };
-                container.appendChild(btn);
+            const container = document.getElementById("diffContainer");
+            container.replaceChildren();
+
+            Object.entries(difficultyRequirements).forEach(([difficulty, requirement]) => {
+                const className = `diff-btn ${difficulty === currentDifficulty ? "active" : ""}`;
+                const button = createElement(
+                    "button",
+                    className,
+                    `${difficulty} (${requirement} Req)`,
+                    () => setDifficulty(difficulty)
+                );
+                container.appendChild(button);
             });
         }
 
         function renderEvidence() {
-            const grid = document.getElementById('evidenceGrid');
-            grid.innerHTML = "";
-            
-            Object.entries(evidenceData).forEach(([type, levels]) => {
-                const card = document.createElement('div');
-                card.className = 'evidence-card';
-                card.innerHTML = `<div class="ev-title">${type}</div>`;
+            const grid = document.getElementById("evidenceGrid");
+            grid.replaceChildren();
 
-                levels.forEach(lvl => {
-                    const btn = document.createElement('button');
-                    const isSelected = selectedEvidence[type] === lvl.l;
-                    btn.className = `level-btn ${isSelected ? 'selected' : ''}`;
-                    btn.innerText = `Level ${lvl.l}: ${lvl.text}`;
-                    btn.onclick = () => selectEvidence(type, lvl.l);
-                    card.appendChild(btn);
+            Object.entries(evidenceData).forEach(([type, levels]) => {
+                const card = createElement("div", "evidence-card");
+                card.appendChild(createElement("div", "ev-title", type));
+
+                levels.forEach(({ level, text }) => {
+                    const className = `level-btn ${selectedEvidence[type] === level ? "selected" : ""}`;
+                    const button = createElement(
+                        "button",
+                        className,
+                        `Level ${level}: ${text}`,
+                        () => selectEvidence(type, level)
+                    );
+                    card.appendChild(button);
                 });
 
-                if (type === "UV" || type === "Writing") {
-                    const visBtn = document.createElement('button');
-                    visBtn.className = 'visual-btn';
-                    visBtn.innerText = `View ${type} Reference`;
-                    visBtn.onclick = () => openModal(type);
-                    card.appendChild(visBtn);
+                if (imageLibrary[type]) {
+                    const referenceButton = createElement(
+                        "button",
+                        "visual-btn",
+                        `View ${type} Reference`,
+                        () => openModal(type)
+                    );
+                    card.appendChild(referenceButton);
                 }
 
                 grid.appendChild(card);
@@ -495,30 +510,27 @@
             } else {
                 selectedEvidence[type] = level;
             }
+
             renderEvidence();
             updateTerminal();
         }
 
         function updateTerminal() {
-            const output = document.getElementById('terminalOutput');
-            const req = config[currentDiff].req;
-            
+            const output = document.getElementById("terminalOutput");
+            const requirement = difficultyRequirements[currentDifficulty];
             const entries = Object.entries(selectedEvidence);
+
             if (entries.length === 0) {
-                output.innerHTML = `> Awaiting data input...\n> Minimum evidence required: ${req}`;
+                output.textContent = `> Awaiting data input...\n> Minimum evidence required: ${requirement}`;
                 return;
             }
 
-            let text = "";
-            entries.forEach(([type, lvl]) => { text += `> ADD ${type.toUpperCase()} ${lvl}\n`; });
-            
-            if (entries.length < req) {
-                text += `\n[System] Need ${req - entries.length} more characteristic(s) to scan.`;
-            } else {
-                text += `\n> Type SCAN in terminal.`;
-            }
+            const commands = entries.map(([type, level]) => `> ADD ${type.toUpperCase()} ${level}`);
+            const status = entries.length < requirement
+                ? `[System] Need ${requirement - entries.length} more characteristic(s) to scan.`
+                : "> Type SCAN in terminal.";
 
-            output.innerHTML = text;
+            output.textContent = `${commands.join("\n")}\n\n${status}`;
         }
 
         function resetAll() {
@@ -527,45 +539,40 @@
         }
 
         function openModal(type) {
-            const modal = document.getElementById('imageModal');
-            const title = document.getElementById('modalTitle');
-            const container = document.getElementById('modalGalleryContainer');
-            
-            title.innerText = `${type} Evidence Protocol`;
-            container.innerHTML = "";
+            const modal = document.getElementById("imageModal");
+            const title = document.getElementById("modalTitle");
+            const container = document.getElementById("modalGalleryContainer");
+            const referenceData = imageLibrary[type];
 
-            const data = imageLibrary[type];
-            if(data) {
-                Object.entries(data).forEach(([levelName, images]) => {
-                    const section = document.createElement('div');
-                    section.className = 'gallery-level-section';
-                    
-                    const header = document.createElement('div');
-                    header.className = 'gallery-level-title';
-                    header.innerText = levelName;
-                    section.appendChild(header);
+            if (!referenceData) return;
 
-                    const grid = document.createElement('div');
-                    grid.className = 'gallery-grid';
+            title.textContent = `${type} Evidence Protocol`;
+            container.replaceChildren();
 
-                    images.forEach(imgSrc => {
-                        const img = document.createElement('img');
-                        img.src = imgSrc;
-                        img.className = 'gallery-img';
-                        grid.appendChild(img);
-                    });
+            Object.entries(referenceData).forEach(([levelName, images]) => {
+                const section = createElement("div", "gallery-level-section");
+                section.appendChild(createElement("div", "gallery-level-title", levelName));
 
-                    section.appendChild(grid);
-                    container.appendChild(section);
+                const grid = createElement("div", "gallery-grid");
+                images.forEach(imageSource => {
+                    const image = createElement("img", "gallery-img");
+                    image.src = imageSource;
+                    grid.appendChild(image);
                 });
-            }
-            
-            modal.classList.add('active');
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            });
+
+            modal.classList.add("active");
         }
 
-        function closeModal(e) {
-            if (e.target.id === 'imageModal' || e.target.classList.contains('close-modal')) {
-                document.getElementById('imageModal').classList.remove('active');
+        function closeModal(event) {
+            const clickedBackdrop = event.target.id === "imageModal";
+            const clickedCloseButton = event.target.classList.contains("close-modal");
+
+            if (clickedBackdrop || clickedCloseButton) {
+                document.getElementById("imageModal").classList.remove("active");
             }
         }
 
