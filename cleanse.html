@@ -16,25 +16,43 @@
             --danger: #ef4444; 
             --border: #333333;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; touch-action: manipulation; }
 
         header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; position: relative; }
         h1 { font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
 
-        .reset-small-btn {
+        .header-btn-group {
             position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            display: flex; gap: 8px; align-items: center;
+        }
+
+        .hdr-btn {
             background: #2c2c2c; border: 1px solid #444; color: #ff6b6b;
             font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s;
-            text-transform: uppercase; font-size: 0.75rem; padding: 5px 12px;
+            text-transform: uppercase; font-size: 0.75rem; padding: 6px 12px; min-height: 44px;
+            display: inline-flex; align-items: center; justify-content: center; user-select: none;
         }
-        .reset-small-btn:hover { background: #333; border-color: var(--danger); color: var(--danger); }
+        .hdr-btn:hover { background: #333; border-color: var(--danger); color: var(--danger); }
+
+        .hdr-btn.mic-btn { color: #ffffff; font-size: 1rem; }
+        .hdr-btn.mic-btn.listening {
+            background: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #ef4444;
+            animation: pulse-mic 1.5s infinite;
+        }
+        @keyframes pulse-mic {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        .voice-status { font-size: 0.75rem; color: var(--accent); font-style: italic; min-height: 14px; text-align: center; margin-top: 5px; }
 
         .difficulty-container { display: flex; gap: 10px; width: 100%; max-width: 1200px; margin-bottom: 20px; flex-wrap: wrap; }
         .diff-btn {
             flex: 1; padding: 12px; background: var(--bg-panel); border: 1px solid var(--border); color: #ffffff;
-            font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; transition: 0.2s; min-width: 150px;
+            font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; transition: 0.2s; min-width: 150px; min-height: 44px;
         }
         .diff-btn:hover { border-color: #555; background: #252525; }
         .diff-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(16, 185, 129, 0.1); }
@@ -48,12 +66,12 @@
         .evidence-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .ev-title { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
         
-        .visual-btn { background: var(--bg-btn); border: 1px solid var(--border); color: var(--accent); padding: 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-top: auto; width: 100%; transition: 0.2s; font-weight: bold; text-transform: uppercase; }
+        .visual-btn { background: var(--bg-btn); border: 1px solid var(--border); color: var(--accent); padding: 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-top: auto; width: 100%; transition: 0.2s; font-weight: bold; text-transform: uppercase; min-height: 44px; }
         .visual-btn:hover { background: #333; border-color: var(--accent); }
 
         .level-btn {
             width: 100%; padding: 12px; margin-bottom: 8px; background: var(--bg-btn); border: 1px solid var(--border);
-            color: #ffffff; cursor: pointer; text-align: left; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: 0.2s;
+            color: #ffffff; cursor: pointer; text-align: left; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: 0.2s; min-height: 44px;
         }
         .level-btn:hover { background: #333; border-color: #555; }
         .level-btn.selected { border-color: var(--accent); background: rgba(16, 185, 129, 0.15); color: #fff; }
@@ -79,6 +97,30 @@
         .phrase-grid { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
         .phrase-tag { background: var(--bg-btn); border: 1px solid #444; color: var(--text-dim); font-size: 0.75rem; padding: 4px 6px; border-radius: 4px; font-family: 'Consolas', monospace; user-select: text; }
 
+        .mobile-jump-nav {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .jump-btn {
+            flex: 1 1 120px;
+            max-width: 220px;
+            min-height: 44px;
+            padding: 8px 12px;
+            background: var(--bg-btn);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .jump-btn:hover { background: #333; border-color: var(--accent); }
+
         .footer-link { font-size: 0.7rem; color: #ffffff; text-align: center; margin-top: 5px; margin-bottom: 5px; }
         .footer-link a { color: var(--accent); text-decoration: none; font-weight: bold; }
         .footer-link a:hover { text-decoration: underline; }
@@ -98,16 +140,27 @@
         .gallery-img { width: 100%; max-width: 160px; height: auto; border: 1px solid #444; border-radius: 4px; object-fit: cover; }
 
         @media (max-width: 950px) {
-            header { padding-top: 45px; }
-            .reset-small-btn { top: 12px; left: 50%; transform: translateX(-50%); }
-            .main-layout { display: flex; flex-direction: column; }
-            .col-left, .col-right { display: contents; }
-            .box-terminal { order: 1; }
-            .box-evidence { order: 2; }
-            .box-artifacts { order: 3; }
-            .box-phrases { order: 4; }
-            .box-mappicker { order: 5; }
-            .box-fieldnotes { order: 6; }
+            header { padding-top: 56px; order: 0; }
+            .header-btn-group { top: 0; left: 0; transform: none; }
+            .mobile-jump-nav { display: flex; }
+            .top-jump-nav { order: 1; margin-bottom: 20px; }
+            .main-layout, .col-left, .col-right { display: contents; }
+            .box-terminal { order: 2; }
+            .difficulty-container { order: 3; }
+            .box-evidence { order: 4; }
+            .box-fieldnotes { order: 5; }
+            .box-artifacts { order: 6; }
+            .box-phrases { order: 7; }
+            .box-mappicker { order: 8; }
+            .bottom-jump-nav { order: 9; margin-top: 20px; }
+            .footer-container { order: 10; }
+            .box-terminal, .box-evidence, .box-fieldnotes, .box-artifacts, .box-phrases, .box-mappicker {
+                width: 100%;
+                max-width: 1200px;
+                margin-bottom: 20px;
+                scroll-margin-top: 12px;
+            }
+            .difficulty-container { scroll-margin-top: 12px; }
         }
 
         @media (max-width: 768px) {
@@ -121,10 +174,18 @@
 </head>
 <body>
 
-    <header>
-        <button class="reset-small-btn" onclick="resetAll()">Reset</button>
+    <header id="top">
+        <div class="header-btn-group">
+            <button class="hdr-btn" onclick="resetAll()">Reset</button>
+            <button id="micBtn" class="hdr-btn mic-btn" onclick="toggleVoice()" title="Voice Command">🎤</button>
+        </div>
         <h1>Affixer Spectral Scanner Profiler</h1>
+        <div id="voiceStatus" class="voice-status"></div>
     </header>
+
+    <nav class="mobile-jump-nav top-jump-nav" aria-label="Jump to field notes">
+        <button class="jump-btn" onclick="scrollToSection('fieldnotesSection')">Field Notes</button>
+    </nav>
 
     <div class="difficulty-container" id="diffContainer"></div>
 
@@ -133,7 +194,7 @@
         <div class="col-left">
             <div class="box-evidence evidence-grid" id="evidenceGrid"></div>
             
-            <div class="box-fieldnotes info-box">
+            <div class="box-fieldnotes info-box" id="fieldnotesSection">
                 <h3>Field Notes</h3>
                 <div class="fieldnotes-grid">
                     <div>
@@ -181,7 +242,7 @@
         </div>
 
         <div class="col-right">
-            <div class="box-terminal terminal-box">
+            <div class="box-terminal terminal-box" id="terminalSection">
                 <div class="terminal-header">Input Commands</div>
                 <div class="terminal-output" id="terminalOutput">> Awaiting data input...</div>
             </div>
@@ -244,7 +305,7 @@
                 </div>
             </div>
 
-            <div class="box-mappicker info-box" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+            <div class="box-mappicker info-box" id="mapPickerSection" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                 <h3 style="width: 100%; text-align: left;">Map Picker</h3>
                 <div style="position: relative; margin: 15px 0; width: 100%; display: flex; justify-content: center;">
                     <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 15px solid var(--accent); z-index: 5;"></div>
@@ -255,6 +316,10 @@
             </div>
         </div>
     </div>
+
+    <nav class="mobile-jump-nav bottom-jump-nav" aria-label="Return to top">
+        <button class="jump-btn" onclick="scrollToSection('top')">Top</button>
+    </nav>
 
     <div class="footer-container">
         <div class="footer-link">The Other Side <a href="https://theotherside-game.fandom.com/wiki/The_Other_Side_Wiki" target="_blank">Wiki</a>, Created by nena</div>
@@ -356,6 +421,9 @@
         let currentDifficulty = "Master";
         let selectedEvidence = {};
 
+        let recognition = null;
+        let isListening = false;
+
         function createElement(tagName, className, text, onClick) {
             const element = document.createElement(tagName);
             if (className) element.className = className;
@@ -365,11 +433,273 @@
             return element;
         }
 
+        function initVoiceRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                const micBtn = document.getElementById('micBtn');
+                if (micBtn) micBtn.title = "Voice recognition not supported in this browser";
+                return;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                const micBtn = document.getElementById('micBtn');
+                if (micBtn) micBtn.classList.add('listening');
+                showVoiceStatus("Listening... Speak command");
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                const micBtn = document.getElementById('micBtn');
+                if (micBtn) micBtn.classList.remove('listening');
+            };
+
+            recognition.onerror = (event) => {
+                isListening = false;
+                const micBtn = document.getElementById('micBtn');
+                if (micBtn) micBtn.classList.remove('listening');
+                if (event.error !== 'no-speech') {
+                    showVoiceStatus("Voice error: " + event.error);
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                showVoiceStatus(`Heard: "${transcript}"`);
+                parseVoiceCommand(transcript);
+            };
+        }
+
+        function toggleVoice() {
+            if (!recognition) {
+                alert("Voice recognition is not supported in this browser. Please use Chrome, Edge, or Safari.");
+                return;
+            }
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        }
+
+        function showVoiceStatus(msg) {
+            const el = document.getElementById('voiceStatus');
+            if (el) {
+                el.innerText = msg;
+                setTimeout(() => {
+                    if (el.innerText === msg) el.innerText = '';
+                }, 4000);
+            }
+        }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function scrollToMapPickerAndSpin() {
+            const mapPicker = document.getElementById("mapPickerSection");
+            if (mapPicker) {
+                mapPicker.scrollIntoView({ behavior: "smooth", block: "start" });
+                setTimeout(spinWheel, 350);
+                return;
+            }
+            spinWheel();
+        }
+
+        function showSelectedMap(mapName) {
+            const mapPicker = document.getElementById("mapPickerSection");
+            if (mapPicker) mapPicker.scrollIntoView({ behavior: "smooth", block: "start" });
+            const result = document.getElementById("wheelResult");
+            if (result) result.textContent = `Destination: ${mapName}`;
+        }
+
+        function setEvidenceVoice(type, level) {
+            selectedEvidence[type] = level;
+            renderEvidence();
+            updateTerminal();
+        }
+
+        function parseVoiceCommand(text) {
+            if (text.includes("reset") || text.includes("clear all")) {
+                resetAll();
+                return;
+            }
+
+            // Map Wheel & Direct Selection
+            if (text.includes("spin wheel") || text.includes("spin map") || text.includes("random map") || text.includes("pick a map") || text.includes("choose map") || text.includes("pick map")) {
+                scrollToMapPickerAndSpin();
+                return;
+            }
+
+            const mapTriggers = [
+                { name: "St. Joseph's Orphanage", keys: ["orphanage", "st joseph", "joseph"] },
+                { name: "Abaddon Hallows West", keys: ["abaddon west"] },
+                { name: "Abaddon Hallows East (P)", keys: ["abaddon east p", "abaddon p"] },
+                { name: "Abaddon Hallows East", keys: ["abaddon east"] },
+                { name: "Summerhill Psychiatric", keys: ["summerhill", "psychiatric", "asylum"] },
+                { name: "Stone Manor Plantation", keys: ["stone manor", "plantation"] },
+                { name: "317 Aspen Heights", keys: ["aspen", "317"] },
+                { name: "1205 Cedar Street", keys: ["cedar", "1205"] },
+                { name: "12 Ravenwood Lane", keys: ["ravenwood", "12 ravenwood"] }
+            ];
+
+            for (let m of mapTriggers) {
+                if (m.keys.some(k => text.includes(k))) {
+                    showSelectedMap(m.name);
+                    return;
+                }
+            }
+
+            if (text.includes("novice")) { setDifficulty("Novice"); return; }
+            if (text.includes("intermediate")) { setDifficulty("Intermediate"); return; }
+            if (text.includes("expert")) { setDifficulty("Expert"); return; }
+            if (text.includes("master")) { setDifficulty("Master"); return; }
+
+            let cleanText = text
+                .replace(/\bminus\b/g, "-")
+                .replace(/\bnegative\b/g, "-")
+                .replace(/\bone\b/g, "1")
+                .replace(/\btwo\b/g, "2")
+                .replace(/\bto\b/g, "2")
+                .replace(/\bthree\b/g, "3")
+                .replace(/\bfour\b/g, "4")
+                .replace(/\bfive\b/g, "5")
+                .replace(/\bsix\b/g, "6")
+                .replace(/\bseven\b/g, "7")
+                .replace(/\beight\b/g, "8")
+                .replace(/\bnine\b/g, "9")
+                .replace(/\bzero\b/g, "0")
+                .replace(/-\s+(?=\d)/g, "-");
+
+            const levelMatch = cleanText.match(/\blevel\s*([1-4])\b/);
+            const spokenLevel = levelMatch ? Number(levelMatch[1]) : null;
+
+            // 1. Radiation
+            if (cleanText.includes("radiation") || cleanText.includes("geiger") || /\brad\b/.test(cleanText)) {
+                if (cleanText.includes("remove") || cleanText.includes("clear")) {
+                    delete selectedEvidence["Radiation"];
+                    renderEvidence(); updateTerminal(); return;
+                }
+                if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("Radiation", spokenLevel); return; }
+                let nums = cleanText.match(/\d+/g);
+                if (nums) {
+                    let val = parseFloat(nums[0]);
+                    if (val >= 100 && val <= 500) { setEvidenceVoice("Radiation", 1); return; }
+                    if (val > 500 && val <= 1000) { setEvidenceVoice("Radiation", 2); return; }
+                    if (val > 1000) { setEvidenceVoice("Radiation", 3); return; }
+                }
+                if (cleanText.includes("intense") || cleanText.includes("level 3") || cleanText.includes("high") || cleanText.includes("strong")) { setEvidenceVoice("Radiation", 3); return; }
+                if (cleanText.includes("moderate") || cleanText.includes("medium") || cleanText.includes("level 2")) { setEvidenceVoice("Radiation", 2); return; }
+                if (cleanText.includes("minimal") || cleanText.includes("weak") || cleanText.includes("low") || cleanText.includes("level 1")) { setEvidenceVoice("Radiation", 1); return; }
+            }
+
+            // 2. Thermal / Temperature
+            if (cleanText.includes("thermal") || cleanText.includes("temperature") || cleanText.includes("temp") || cleanText.includes("degrees") || cleanText.includes("celsius") || cleanText.includes("fahrenheit")) {
+                if (cleanText.includes("remove") || cleanText.includes("clear")) {
+                    delete selectedEvidence["Thermal"];
+                    renderEvidence(); updateTerminal(); return;
+                }
+                if (spokenLevel && spokenLevel <= 4) { setEvidenceVoice("Thermal", spokenLevel); return; }
+                let numMatch = cleanText.match(/(-?\d+(\.\d+)?)/);
+                if (numMatch) {
+                    const val = parseFloat(numMatch[0]);
+                    const usesFahrenheit = cleanText.includes("fahrenheit") || /\bdegrees?\s*f\b/.test(cleanText);
+                    const usesCelsius = cleanText.includes("celsius") || /\bdegrees?\s*c\b/.test(cleanText);
+
+                    if (!usesFahrenheit) {
+                        if (val <= -13.8) { setEvidenceVoice("Thermal", 4); return; }
+                        if (val >= -13.7 && val <= -10.0) { setEvidenceVoice("Thermal", 3); return; }
+                        if (val >= -9.9 && val <= 0.0) { setEvidenceVoice("Thermal", 2); return; }
+                        if (val >= 0.1 && val <= 4.4) { setEvidenceVoice("Thermal", 1); return; }
+                    }
+
+                    if (!usesCelsius) {
+                        if (val <= 7.2) { setEvidenceVoice("Thermal", 4); return; }
+                        if (val >= 7.3 && val <= 14.0) { setEvidenceVoice("Thermal", 3); return; }
+                        if (val >= 14.2 && val <= 32.0) { setEvidenceVoice("Thermal", 2); return; }
+                        if (val >= 32.2 && val <= 39.9) { setEvidenceVoice("Thermal", 1); return; }
+                    }
+                }
+                if (cleanText.includes("frigid") || cleanText.includes("sub zero") || cleanText.includes("level 4")) { setEvidenceVoice("Thermal", 4); return; }
+                if (cleanText.includes("significant") || cleanText.includes("freezing") || cleanText.includes("level 3")) { setEvidenceVoice("Thermal", 3); return; }
+                if (cleanText.includes("moderate") || cleanText.includes("medium") || cleanText.includes("level 2")) { setEvidenceVoice("Thermal", 2); return; }
+                if (cleanText.includes("mild") || cleanText.includes("level 1")) { setEvidenceVoice("Thermal", 1); return; }
+            }
+
+            // 3. EMF
+            if (cleanText.includes("emf") || cleanText.includes("e m f") || cleanText.includes("field")) {
+                if (cleanText.includes("remove") || cleanText.includes("clear")) {
+                    delete selectedEvidence["EMF"];
+                    renderEvidence(); updateTerminal(); return;
+                }
+                if (spokenLevel && spokenLevel <= 4) { setEvidenceVoice("EMF", spokenLevel); return; }
+                let numMatch = cleanText.match(/(\d+(\.\d+)?)/);
+                if (numMatch) {
+                    let val = parseFloat(numMatch[0]);
+                    if (val >= 20.0) { setEvidenceVoice("EMF", 4); return; }
+                    if (val >= 10.0 && val < 20.0) { setEvidenceVoice("EMF", 3); return; }
+                    if (val >= 2.5 && val < 10.0) { setEvidenceVoice("EMF", 2); return; }
+                    if (val >= 1.5 && val < 2.5) { setEvidenceVoice("EMF", 1); return; }
+                }
+                if (cleanText.includes("overwhelming") || cleanText.includes("extreme") || cleanText.includes("level 4")) { setEvidenceVoice("EMF", 4); return; }
+                if (cleanText.includes("strong") || cleanText.includes("high") || cleanText.includes("level 3")) { setEvidenceVoice("EMF", 3); return; }
+                if (cleanText.includes("moderate") || cleanText.includes("medium") || cleanText.includes("level 2")) { setEvidenceVoice("EMF", 2); return; }
+                if (cleanText.includes("weak") || cleanText.includes("level 1")) { setEvidenceVoice("EMF", 1); return; }
+            }
+
+            // 4. UV
+            if (cleanText.includes("uv") || cleanText.includes("ultraviolet") || cleanText.includes("fingerprints")) {
+                if (cleanText.includes("remove") || cleanText.includes("clear")) {
+                    delete selectedEvidence["UV"];
+                    renderEvidence(); updateTerminal(); return;
+                }
+                if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("UV", spokenLevel); return; }
+                if (cleanText.includes("handprints") || cleanText.includes("clear") || cleanText.includes("patterns") || cleanText.includes("level 3")) { setEvidenceVoice("UV", 3); return; }
+                if (cleanText.includes("glowing") || cleanText.includes("puddles") || cleanText.includes("residues") || cleanText.includes("moderate") || cleanText.includes("level 2")) { setEvidenceVoice("UV", 2); return; }
+                if (cleanText.includes("faint") || cleanText.includes("spray") || cleanText.includes("splotches") || cleanText.includes("traces") || cleanText.includes("level 1")) { setEvidenceVoice("UV", 1); return; }
+            }
+
+            // 5. Audio
+            if (cleanText.includes("audio") || cleanText.includes("sound") || cleanText.includes("spirit box")) {
+                if (cleanText.includes("remove") || cleanText.includes("clear")) {
+                    delete selectedEvidence["Audio"];
+                    renderEvidence(); updateTerminal(); return;
+                }
+                if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("Audio", spokenLevel); return; }
+                if (cleanText.includes("intelligible phrases") || cleanText.includes("phrases") || cleanText.includes("sentences") || cleanText.includes("level 3")) { setEvidenceVoice("Audio", 3); return; }
+                if (cleanText.includes("single word") || cleanText.includes("one word") || cleanText.includes("word") || cleanText.includes("level 2")) { setEvidenceVoice("Audio", 2); return; }
+                if (cleanText.includes("unintelligible") || cleanText.includes("noises") || cleanText.includes("level 1")) { setEvidenceVoice("Audio", 1); return; }
+            }
+
+            // 6. Writing
+            if (cleanText.includes("writing") || cleanText.includes("book")) {
+                if (cleanText.includes("remove") || cleanText.includes("clear")) {
+                    delete selectedEvidence["Writing"];
+                    renderEvidence(); updateTerminal(); return;
+                }
+                if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("Writing", spokenLevel); return; }
+                if (cleanText.includes("threatening") || cleanText.includes("hostile") || cleanText.includes("words") || cleanText.includes("level 3")) { setEvidenceVoice("Writing", 3); return; }
+                if (cleanText.includes("symbolic") || cleanText.includes("enigmas") || cleanText.includes("stars") || cleanText.includes("shapes") || cleanText.includes("level 2")) { setEvidenceVoice("Writing", 2); return; }
+                if (cleanText.includes("scribbling") || cleanText.includes("chaotic") || cleanText.includes("incomprehensible") || cleanText.includes("level 1")) { setEvidenceVoice("Writing", 1); return; }
+            }
+        }
+
         function init() {
             renderDifficulty();
             renderEvidence();
             updateTerminal();
             drawWheel();
+            initVoiceRecognition();
         }
 
         function drawWheel() {
@@ -452,7 +782,8 @@
 
         function setDifficulty(difficulty) {
             currentDifficulty = difficulty;
-            init();
+            renderDifficulty();
+            updateTerminal();
         }
 
         function renderDifficulty() {
@@ -535,7 +866,10 @@
 
         function resetAll() {
             selectedEvidence = {};
-            init();
+            renderDifficulty();
+            renderEvidence();
+            updateTerminal();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function openModal(type) {
