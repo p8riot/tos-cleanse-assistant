@@ -69,6 +69,30 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
 .visual-btn { background: var(--bg-btn); border: 1px solid var(--border); color: var(--accent); padding: 10px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; margin-top: auto; width: 100%; transition: 0.2s; font-weight: bold; text-transform: uppercase; min-height: 44px; }
  .visual-btn:hover { background: #333; border-color: var(--accent); }
 
+ .map-filter-controls { width: 100%; margin-top: 4px; }
+ .map-filter-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 7px; }
+ .map-selection-count { color: var(--text-main); font-size: 0.68rem; font-weight: 600; text-align: left; }
+ .map-filter-actions { display: flex; gap: 5px; flex-shrink: 0; }
+ .map-filter-action {
+ background: var(--bg-btn); border: 1px solid #444; color: #ffffff; border-radius: 4px;
+ padding: 5px 8px; min-height: 34px; font-size: 0.62rem; font-weight: bold;
+ text-transform: uppercase; cursor: pointer; transition: 0.2s;
+ }
+ .map-filter-action:hover { background: #333; border-color: var(--accent); }
+ .map-filter-action:disabled { opacity: 0.4; cursor: not-allowed; }
+ .map-toggle-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+ .map-toggle-btn {
+ min-height: 40px; padding: 5px 6px; border-radius: 5px; border: 1px solid #444;
+ background: #181818; color: var(--text-dim); font-size: 0.64rem; line-height: 1.15;
+ font-weight: 600; cursor: pointer; transition: 0.2s; overflow-wrap: anywhere;
+ }
+ .map-toggle-btn:hover { background: var(--bg-btn); color: #ffffff; }
+ .map-toggle-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(16, 185, 129, 0.1); }
+ .map-toggle-btn:not(.active) { text-decoration: line-through; text-decoration-color: var(--danger); opacity: 0.55; }
+ .map-toggle-btn:disabled { cursor: not-allowed; opacity: 0.35; }
+ .map-toggle-btn.active:disabled { opacity: 0.7; }
+ .wheel-spin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
  .level-btn {
  width: 100%; padding: 12px; margin-bottom: 8px; background: var(--bg-btn); border: 1px solid var(--border);
  color: #ffffff; cursor: pointer; text-align: left; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: 0.2s; min-height: 44px;
@@ -338,8 +362,18 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 15px solid var(--accent); z-index: 5;"></div>
  <canvas id="wheelCanvas" width="280" height="280" style="max-width: 100%; height: auto; border-radius: 50%; border: 1px solid var(--border); background: #121212;"></canvas>
  </div>
- <button class="visual-btn" onclick="spinWheel()" style="margin-top: 5px;">Spin Wheel</button>
- <div id="wheelResult" style="margin-top: 10px; font-size: 1rem; font-weight: bold; color: var(--accent); min-height: 24px;"></div>
+ <div class="map-filter-controls">
+ <div class="map-filter-header">
+ <div id="mapSelectionCount" class="map-selection-count">9 of 9 maps included</div>
+ <div class="map-filter-actions">
+ <button id="selectAllMapsBtn" class="map-filter-action" type="button">All</button>
+ <button id="clearAllMapsBtn" class="map-filter-action" type="button">None</button>
+ </div>
+ </div>
+ <div id="mapToggleGrid" class="map-toggle-grid" aria-label="Maps included on the wheel"></div>
+ </div>
+ <button id="wheelSpinBtn" class="visual-btn wheel-spin-btn" onclick="spinWheel()" style="margin-top: 12px;">Spin Wheel</button>
+ <div id="wheelResult" aria-live="polite" style="margin-top: 10px; font-size: 1rem; font-weight: bold; color: var(--accent); min-height: 24px;"></div>
  </div>
  </div>
  </div>
@@ -443,8 +477,10 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  sliceColors: ["#2c2c2c", "#1e1e1e", "#383838", "#222222"]
  };
 
+ const selectedMaps = new Set(wheelData.maps);
  let currentWheelAngle = 0;
  let isSpinning = false;
+ let wheelSpinId = 0;
  let currentDifficulty = "Master";
  let selectedEvidence = {};
 
@@ -768,24 +804,127 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  renderDifficulty();
  renderEvidence();
  updateTerminal();
+ initMapSelector();
  drawWheel();
  initVoiceRecognition();
  }
 
+ function getActiveMaps() {
+ const activeMaps = [];
+ wheelData.maps.forEach((mapName, index) => {
+ if (selectedMaps.has(mapName)) {
+ activeMaps.push({
+ name: mapName,
+ textColor: wheelData.textColors[index]
+ });
+ }
+ });
+ return activeMaps;
+ }
+
+ function initMapSelector() {
+ const grid = document.getElementById("mapToggleGrid");
+ const selectAllButton = document.getElementById("selectAllMapsBtn");
+ const clearAllButton = document.getElementById("clearAllMapsBtn");
+
+ if (!grid || !selectAllButton || !clearAllButton) return;
+
+ grid.replaceChildren();
+ wheelData.maps.forEach(mapName => {
+ const button = createElement("button", "map-toggle-btn", mapName, () => toggleMapOnWheel(mapName));
+ button.dataset.map = mapName;
+ grid.appendChild(button);
+ });
+
+ selectAllButton.addEventListener("click", () => setAllMaps(true));
+ clearAllButton.addEventListener("click", () => setAllMaps(false));
+ updateMapSelectorUI();
+ }
+
+ function toggleMapOnWheel(mapName) {
+ if (isSpinning) return;
+
+ if (selectedMaps.has(mapName)) {
+ selectedMaps.delete(mapName);
+ } else {
+ selectedMaps.add(mapName);
+ }
+
+ currentWheelAngle = 0;
+ const result = document.getElementById("wheelResult");
+ if (result) result.textContent = "";
+ updateMapSelectorUI();
+ drawWheel();
+ }
+
+ function setAllMaps(includeAll) {
+ if (isSpinning) return;
+
+ selectedMaps.clear();
+ if (includeAll) {
+ wheelData.maps.forEach(mapName => selectedMaps.add(mapName));
+ }
+
+ currentWheelAngle = 0;
+ const result = document.getElementById("wheelResult");
+ if (result) result.textContent = includeAll ? "" : "Select at least one map.";
+ updateMapSelectorUI();
+ drawWheel();
+ }
+
+ function updateMapSelectorUI() {
+ const activeMaps = getActiveMaps();
+ const count = document.getElementById("mapSelectionCount");
+ const spinButton = document.getElementById("wheelSpinBtn");
+ const selectAllButton = document.getElementById("selectAllMapsBtn");
+ const clearAllButton = document.getElementById("clearAllMapsBtn");
+
+ if (count) count.textContent = `${activeMaps.length} of ${wheelData.maps.length} maps included`;
+
+ document.querySelectorAll(".map-toggle-btn").forEach(button => {
+ const isActive = selectedMaps.has(button.dataset.map);
+ button.classList.toggle("active", isActive);
+ button.setAttribute("aria-pressed", String(isActive));
+ button.disabled = isSpinning;
+ });
+
+ if (spinButton) spinButton.disabled = isSpinning || activeMaps.length === 0;
+ if (selectAllButton) selectAllButton.disabled = isSpinning || activeMaps.length === wheelData.maps.length;
+ if (clearAllButton) clearAllButton.disabled = isSpinning || activeMaps.length === 0;
+ }
+
  function drawWheel() {
  const canvas = document.getElementById("wheelCanvas");
- if (!canvas || wheelData.maps.length === 0) return;
+ if (!canvas) return;
 
  const context = canvas.getContext("2d");
- const sliceCount = wheelData.maps.length;
+ const activeMaps = getActiveMaps();
  const centerX = canvas.width / 2;
  const centerY = canvas.height / 2;
  const radius = canvas.width / 2 - 5;
- const sliceAngle = (2 * Math.PI) / sliceCount;
 
  context.clearRect(0, 0, canvas.width, canvas.height);
 
- wheelData.maps.forEach((mapName, index) => {
+ if (activeMaps.length === 0) {
+ context.beginPath();
+ context.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+ context.fillStyle = "#121212";
+ context.fill();
+ context.strokeStyle = "#444";
+ context.lineWidth = 2;
+ context.stroke();
+ context.fillStyle = "#888";
+ context.font = "bold 15px 'Segoe UI', sans-serif";
+ context.textAlign = "center";
+ context.textBaseline = "middle";
+ context.fillText("No maps selected", centerX, centerY);
+ return;
+ }
+
+ const sliceCount = activeMaps.length;
+ const sliceAngle = (2 * Math.PI) / sliceCount;
+
+ activeMaps.forEach((map, index) => {
  const startAngle = currentWheelAngle + index * sliceAngle;
  const endAngle = startAngle + sliceAngle;
 
@@ -803,17 +942,21 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  context.translate(centerX, centerY);
  context.rotate(startAngle + sliceAngle / 2);
  context.textAlign = "right";
- context.fillStyle = wheelData.textColors[index % wheelData.textColors.length];
+ context.textBaseline = "middle";
+ context.fillStyle = map.textColor;
  context.font = "bold 10px 'Segoe UI', sans-serif";
- context.fillText(mapName, radius - 10, 3);
+ context.fillText(map.name, radius - 10, 0);
  context.restore();
  });
  }
 
  function spinWheel() {
- if (isSpinning || wheelData.maps.length === 0) return;
+ const activeMaps = getActiveMaps();
+ if (isSpinning || activeMaps.length === 0) return;
 
  isSpinning = true;
+ const spinId = ++wheelSpinId;
+ updateMapSelectorUI();
  document.getElementById("wheelResult").textContent = "Selecting location...";
 
  const totalRotation = (Math.random() * 12 + 18) * Math.PI;
@@ -821,6 +964,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  const startTimestamp = performance.now();
 
  function animate(now) {
+ if (spinId !== wheelSpinId) return;
+
  const elapsed = now - startTimestamp;
  const progress = Math.min(elapsed / duration, 1);
  const easeOut = 1 - Math.pow(1 - progress, 4);
@@ -834,20 +979,23 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  }
 
  isSpinning = false;
- calculateWheelWinner();
+ calculateWheelWinner(activeMaps);
+ updateMapSelectorUI();
  }
 
  requestAnimationFrame(animate);
  }
 
- function calculateWheelWinner() {
- const sliceAngle = (2 * Math.PI) / wheelData.maps.length;
+ function calculateWheelWinner(activeMaps = getActiveMaps()) {
+ if (activeMaps.length === 0) return;
+
+ const sliceAngle = (2 * Math.PI) / activeMaps.length;
  let pointerAngle = (3 * Math.PI / 2 - currentWheelAngle) % (2 * Math.PI);
 
  if (pointerAngle < 0) pointerAngle += 2 * Math.PI;
 
- const winningIndex = Math.floor(pointerAngle / sliceAngle) % wheelData.maps.length;
- document.getElementById("wheelResult").textContent = `Destination: ${wheelData.maps[winningIndex]}`;
+ const winningIndex = Math.floor(pointerAngle / sliceAngle) % activeMaps.length;
+ document.getElementById("wheelResult").textContent = `Destination: ${activeMaps[winningIndex].name}`;
  }
 
  function setDifficulty(difficulty) {
@@ -975,9 +1123,18 @@ const textSpan = createElement("span", undefined, `> ${cmdText}`);
 
  function resetAll() {
  selectedEvidence = {};
+ wheelSpinId++;
+ isSpinning = false;
+ currentWheelAngle = 0;
+ selectedMaps.clear();
+ wheelData.maps.forEach(mapName => selectedMaps.add(mapName));
+ const wheelResult = document.getElementById("wheelResult");
+ if (wheelResult) wheelResult.textContent = "";
  renderDifficulty();
  renderEvidence();
  updateTerminal();
+ updateMapSelectorUI();
+ drawWheel();
  window.scrollTo({ top: 0, behavior: 'smooth' });
  }
 
