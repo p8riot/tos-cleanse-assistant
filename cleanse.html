@@ -297,6 +297,17 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  @media (max-width: 500px) {
  .evidence-grid { grid-template-columns: 1fr; }
  }
+
+
+ .theme-control { display:flex; align-items:center; justify-content:center; gap:8px; margin:10px auto 4px; font-size:.7rem; color:var(--text-dim); }
+ .theme-select { background:var(--bg-btn); color:var(--text-main); border:1px solid var(--border); border-radius:4px; padding:5px 8px; font-size:.7rem; min-height:34px; }
+ .theme-select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+ @media (max-width:600px) {
+   .command-actions { display:none !important; }
+   .terminal-line-row.command-row { flex-direction:row; align-items:center; }
+   .command-text-wrap { width:100%; }
+ }
+
  </style>
 </head>
 <body>
@@ -304,7 +315,6 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  <header id="top">
  <div class="header-btn-group">
  <button class="hdr-btn" type="button" onclick="resetAll()">Reset</button>
- <button id="themeBtn" class="hdr-btn" type="button" aria-expanded="false" aria-controls="themePicker">Theme</button>
  <button id="installBtn" class="hdr-btn install-btn" type="button" hidden>Install</button>
  <button id="micBtn" class="hdr-btn mic-btn" type="button" onclick="toggleVoice()" title="Voice Command" aria-label="Voice Command">🎤</button>
  </div>
@@ -312,7 +322,6 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  <div id="voiceStatus" class="voice-status" aria-live="polite"></div>
  <div id="appleInstallNote" class="apple-install-note" hidden>iPhone/iPad: open the Share menu, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</div>
  </header>
- <div id="themePicker" class="theme-picker" hidden aria-label="Choose theme"></div>
 
  <nav class="mobile-jump-nav top-jump-nav" aria-label="Jump to field notes">
  <button class="jump-btn" onclick="scrollToSection('fieldnotesSection')">Field Notes</button>
@@ -468,6 +477,10 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  <div class="footer-container">
  <div class="footer-link">The Other Side <a href="https://theotherside-game.fandom.com/wiki/The_Other_Side_Wiki" target="_blank">Wiki</a>, Created by nena</div>
  <div class="footer-link">A.S.S. Profiler (Cleanse Assistant) and <a href="https://p8riot.github.io/tos-ghost-tracker/Index.html" target="_blank">P.M.S. Tracker</a> (Identify Assistant), Created by <a href="https://linktr.ee/p8riot" target="_blank">p8riot</a></div>
+ <div class="theme-control">
+ <label for="themeSelect">Theme</label>
+ <select id="themeSelect" class="theme-select" aria-label="Color theme"></select>
+ </div>
  </div>
 
  <div id="imageModal" class="modal" onclick="closeModal(event)" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
@@ -670,30 +683,22 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
  const themeMeta = document.querySelector('meta[name="theme-color"]');
  if (themeMeta && accent) themeMeta.setAttribute("content", accent);
- document.querySelectorAll(".theme-option").forEach(button => {
-  const active = button.dataset.theme === validTheme;
-  button.classList.toggle("active", active);
-  button.setAttribute("aria-pressed", String(active));
- });
+ const selector = document.getElementById("themeSelect");
+ if (selector && selector.value !== validTheme) selector.value = validTheme;
  drawWheel();
  }
 
  function initThemes() {
- const picker = document.getElementById("themePicker");
- const button = document.getElementById("themeBtn");
- if (!picker || !button) return;
- picker.replaceChildren();
+ const selector = document.getElementById("themeSelect");
+ if (!selector) return;
+ selector.replaceChildren();
  themes.forEach(([id, label]) => {
-  const option = createElement("button", "theme-option", label, () => { applyTheme(id); picker.hidden = true; button.setAttribute("aria-expanded", "false"); });
-  option.dataset.theme = id;
-  option.setAttribute("aria-pressed", "false");
-  picker.appendChild(option);
+  const option = document.createElement("option");
+  option.value = id;
+  option.textContent = label;
+  selector.appendChild(option);
  });
- button.addEventListener("click", () => {
-  picker.hidden = !picker.hidden;
-  button.setAttribute("aria-expanded", String(!picker.hidden));
-  if (!picker.hidden) picker.querySelector(".theme-option.active")?.focus();
- });
+ selector.addEventListener("change", () => applyTheme(selector.value));
  let saved = "spectral-green";
  try { saved = localStorage.getItem("ass-profiler-theme") || saved; } catch (_) {}
  applyTheme(saved);
