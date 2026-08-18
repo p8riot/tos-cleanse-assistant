@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
  <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Cleanse Assistant - The Other Side</title>
+ <meta name="theme-color" content="#10b981">
+ <meta name="apple-mobile-web-app-capable" content="yes">
+ <meta name="apple-mobile-web-app-status-bar-style" content="black">
+ <meta name="apple-mobile-web-app-title" content="A.S.S. Profiler">
+ <link rel="manifest" href="./manifest.webmanifest">
+ <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
  <style>
  :root {
  --bg-dark: #000000; 
@@ -35,6 +41,15 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  display: inline-flex; align-items: center; justify-content: center; user-select: none;
  }
  .hdr-btn:hover { background: #333; border-color: var(--danger); color: var(--danger); }
+
+ .hdr-btn.install-btn { color: var(--accent); border-color: rgba(16, 185, 129, 0.55); }
+ .hdr-btn.install-btn:hover { background: rgba(16, 185, 129, 0.12); border-color: var(--accent); color: #ffffff; }
+ .hdr-btn.install-btn[hidden] { display: none !important; }
+ .apple-install-note {
+  margin-top: 8px; padding: 7px 10px; border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 5px;
+  background: rgba(16, 185, 129, 0.08); color: #ffffff; font-size: 0.75rem; line-height: 1.35;
+ }
+ .apple-install-note[hidden] { display: none !important; }
 
  .hdr-btn.mic-btn { color: #ffffff; font-size: 1rem; }
  .hdr-btn.mic-btn.listening {
@@ -177,7 +192,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
 
  .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 50px; overflow-y: auto; }
  .modal.active { display: flex; }
- .close-modal { position: fixed; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; z-index: 101; }
+ .close-modal { position: fixed; top: 20px; right: 30px; color: #fff; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; z-index: 101; background: transparent; border: 0; padding: 0 6px; line-height: 1; min-width: 44px; min-height: 44px; }
+ .close-modal:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
  .close-modal:hover { color: var(--danger); }
  
 .modal-content-container { width: 90%; max-width: 1000px; margin-bottom: 50px; }
@@ -187,6 +203,12 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  .gallery-level-title { font-size: 1.2rem; color: #fff; margin-bottom: 15px; font-weight: bold; }
  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; justify-items: center; }
  .gallery-img { width: 100%; max-width: 160px; height: auto; border: 1px solid #444; border-radius: 4px; object-fit: cover; }
+
+
+ @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hdr-btn.mic-btn.listening { animation: none; }
+ }
 
  @media (max-width: 950px) {
  header { padding-top: 56px; order: 0; }
@@ -225,11 +247,13 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
 
  <header id="top">
  <div class="header-btn-group">
- <button class="hdr-btn" onclick="resetAll()">Reset</button>
- <button id="micBtn" class="hdr-btn mic-btn" onclick="toggleVoice()" title="Voice Command">🎤</button>
+ <button class="hdr-btn" type="button" onclick="resetAll()">Reset</button>
+ <button id="installBtn" class="hdr-btn install-btn" type="button" hidden>Install</button>
+ <button id="micBtn" class="hdr-btn mic-btn" type="button" onclick="toggleVoice()" title="Voice Command" aria-label="Voice Command">🎤</button>
  </div>
  <h1>Affixer Spectral Scanner Profiler</h1>
- <div id="voiceStatus" class="voice-status"></div>
+ <div id="voiceStatus" class="voice-status" aria-live="polite"></div>
+ <div id="appleInstallNote" class="apple-install-note" hidden>iPhone/iPad: open the Share menu, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</div>
  </header>
 
  <nav class="mobile-jump-nav top-jump-nav" aria-label="Jump to field notes">
@@ -387,8 +411,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <div class="footer-link">A.S.S. Profiler (Cleanse Assistant) and <a href="https://p8riot.github.io/tos-ghost-tracker/Index.html" target="_blank">P.M.S. Tracker</a> (Identify Assistant), Created by <a href="https://linktr.ee/p8riot" target="_blank">p8riot</a></div>
  </div>
 
- <div id="imageModal" class="modal" onclick="closeModal(event)">
- <span class="close-modal" onclick="closeModal(event)">×</span>
+ <div id="imageModal" class="modal" onclick="closeModal(event)" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+ <button class="close-modal" type="button" onclick="closeModal(event)" aria-label="Close visual reference">×</button>
  <div class="modal-content-container">
  <div class="modal-title" id="modalTitle">Visual Reference</div>
  <div id="modalGalleryContainer"></div>
@@ -486,6 +510,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
 
  let recognition = null;
  let isListening = false;
+ let deferredInstallPrompt = null;
+ let modalReturnFocus = null;
 
  function createElement(tagName, className, text, onClick) {
  const element = document.createElement(tagName);
@@ -800,6 +826,71 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  }
  }
 
+ function isStandaloneMode() {
+ return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+ }
+
+ function isAppleMobileDevice() {
+ const ua = navigator.userAgent || '';
+ return /iPad|iPhone|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+ }
+
+ function updateInstallUI() {
+ const installBtn = document.getElementById('installBtn');
+ const appleNote = document.getElementById('appleInstallNote');
+ const standalone = isStandaloneMode();
+ const appleMobile = isAppleMobileDevice();
+
+ if (installBtn) installBtn.hidden = standalone || appleMobile || !deferredInstallPrompt;
+ if (appleNote) appleNote.hidden = standalone || !appleMobile;
+ }
+
+ function initInstallExperience() {
+ const installBtn = document.getElementById('installBtn');
+ updateInstallUI();
+
+ window.addEventListener('beforeinstallprompt', event => {
+ event.preventDefault();
+ deferredInstallPrompt = event;
+ updateInstallUI();
+ });
+
+ window.addEventListener('appinstalled', () => {
+ deferredInstallPrompt = null;
+ updateInstallUI();
+ });
+
+ const standaloneQuery = window.matchMedia('(display-mode: standalone)');
+ if (typeof standaloneQuery.addEventListener === 'function') {
+ standaloneQuery.addEventListener('change', updateInstallUI);
+ }
+
+ if (installBtn) {
+ installBtn.addEventListener('click', async () => {
+ if (!deferredInstallPrompt) return;
+ const promptEvent = deferredInstallPrompt;
+ deferredInstallPrompt = null;
+ updateInstallUI();
+ try {
+ promptEvent.prompt();
+ await promptEvent.userChoice;
+ } catch (error) {
+ console.warn('Install prompt could not be completed.', error);
+ }
+ updateInstallUI();
+ });
+ }
+ }
+
+ function registerServiceWorker() {
+ if (!('serviceWorker' in navigator)) return;
+ window.addEventListener('load', () => {
+ navigator.serviceWorker.register('./service-worker.js').catch(error => {
+ console.warn('Service worker registration failed.', error);
+ });
+ });
+ }
+
  function init() {
  renderDifficulty();
  renderEvidence();
@@ -807,6 +898,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  initMapSelector();
  drawWheel();
  initVoiceRecognition();
+ initInstallExperience();
+ registerServiceWorker();
  }
 
  function getActiveMaps() {
@@ -1146,6 +1239,7 @@ const textSpan = createElement("span", undefined, `> ${cmdText}`);
 
  if (!referenceData) return;
 
+ modalReturnFocus = document.activeElement;
  title.textContent = `${type} Evidence Protocol`;
  container.replaceChildren();
 
@@ -1157,6 +1251,7 @@ const textSpan = createElement("span", undefined, `> ${cmdText}`);
  images.forEach(imageSource => {
  const image = createElement("img", "gallery-img");
  image.src = imageSource;
+ image.alt = `${type} ${levelName} visual reference`;
  grid.appendChild(image);
  });
 
@@ -1165,16 +1260,49 @@ const textSpan = createElement("span", undefined, `> ${cmdText}`);
  });
 
  modal.classList.add("active");
+ modal.setAttribute("aria-hidden", "false");
+ requestAnimationFrame(() => modal.querySelector('.close-modal')?.focus());
  }
 
- function closeModal(event) {
- const clickedBackdrop = event.target.id === "imageModal";
- const clickedCloseButton = event.target.classList.contains("close-modal");
+ function closeModal(event = null) {
+ const modal = document.getElementById("imageModal");
+ if (!modal.classList.contains("active")) return;
 
- if (clickedBackdrop || clickedCloseButton) {
- document.getElementById("imageModal").classList.remove("active");
+ if (event) {
+ const clickedBackdrop = event.target === modal;
+ const clickedCloseButton = event.target.closest?.('.close-modal');
+ if (!clickedBackdrop && !clickedCloseButton) return;
+ }
+
+ modal.classList.remove("active");
+ modal.setAttribute("aria-hidden", "true");
+ const returnTarget = modalReturnFocus;
+ modalReturnFocus = null;
+ if (returnTarget && typeof returnTarget.focus === 'function' && document.contains(returnTarget)) {
+ requestAnimationFrame(() => returnTarget.focus());
  }
  }
+
+ document.addEventListener('keydown', event => {
+ const modal = document.getElementById('imageModal');
+ if (!modal?.classList.contains('active')) return;
+
+ if (event.key === 'Escape') {
+ event.preventDefault();
+ closeModal();
+ return;
+ }
+
+ if (event.key === 'Tab') {
+ const focusable = [...modal.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+ .filter(element => !element.hidden && element.offsetParent !== null);
+ if (!focusable.length) return;
+ const first = focusable[0];
+ const last = focusable[focusable.length - 1];
+ if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+ else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+ }
+ });
 
  init();
  </script>
