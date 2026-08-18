@@ -20,11 +20,30 @@
 --accent: #10b981; 
 --warning: #f59e0b; 
 --danger: #ef4444; 
+--status-blue: #60a5fa;
+--status-yellow: #f59e0b;
+--status-red: #ef4444;
+--status-green: #10b981;
 --border: #333333;
+--accent-rgb: 16, 185, 129;
+--terminal-text: #52ff9a;
+--terminal-glow: rgba(16, 185, 129, 0.18);
+--wheel-1: #26322f;
+--wheel-2: #192522;
+--wheel-3: #31423d;
+--wheel-4: #202d29;
  }
+
+ :root[data-theme="uv-violet"] { --bg-dark:#09060f; --bg-panel:#1b1325; --bg-btn:#2a1d3a; --text-main:#f8f4ff; --text-dim:#b7a9c9; --accent:#a855f7; --accent-rgb:168,85,247; --border:#3b2a4d; --terminal-text:#d8b4fe; --terminal-glow:rgba(168,85,247,.18); --wheel-1:#2b1b3d; --wheel-2:#1d132a; --wheel-3:#38234f; --wheel-4:#241731; }
+ :root[data-theme="cold-spot"] { --bg-dark:#031019; --bg-panel:#0b1f2b; --bg-btn:#123043; --text-main:#edfaff; --text-dim:#9fc5d5; --accent:#38bdf8; --accent-rgb:56,189,248; --border:#1d4559; --terminal-text:#7dd3fc; --terminal-glow:rgba(56,189,248,.18); --wheel-1:#113244; --wheel-2:#0a2432; --wheel-3:#174158; --wheel-4:#0d2b3b; }
+ :root[data-theme="radiation"] { --bg-dark:#080d04; --bg-panel:#16200d; --bg-btn:#263417; --text-main:#f7ffe9; --text-dim:#b6c99d; --accent:#a3e635; --accent-rgb:163,230,53; --border:#354a20; --terminal-text:#bef264; --terminal-glow:rgba(163,230,53,.18); --wheel-1:#26351a; --wheel-2:#1b2711; --wheel-3:#324723; --wheel-4:#202e16; }
+ :root[data-theme="amber-terminal"] { --bg-dark:#100b02; --bg-panel:#241909; --bg-btn:#352611; --text-main:#fff8e8; --text-dim:#c7b184; --accent:#f59e0b; --accent-rgb:245,158,11; --border:#4b3516; --terminal-text:#fbbf24; --terminal-glow:rgba(245,158,11,.18); --wheel-1:#3a2913; --wheel-2:#281c0c; --wheel-3:#4a3518; --wheel-4:#30220f; }
+ :root[data-theme="blood-moon"] { --bg-dark:#100305; --bg-panel:#26090e; --bg-btn:#3a1018; --text-main:#fff2f4; --text-dim:#cf9aa3; --accent:#fb7185; --accent-rgb:251,113,133; --border:#541823; --terminal-text:#fda4af; --terminal-glow:rgba(251,113,133,.18); --wheel-1:#3c1019; --wheel-2:#2a0b11; --wheel-3:#501723; --wheel-4:#330e16; }
+ :root[data-theme="ghost-orb"] { --bg-dark:#0d0710; --bg-panel:#211127; --bg-btn:#32183b; --text-main:#fff5ff; --text-dim:#c8a5ce; --accent:#ff66cc; --accent-rgb:255,102,204; --border:#4d2458; --terminal-text:#ff9ade; --terminal-glow:rgba(255,102,204,.18); --wheel-1:#35183d; --wheel-2:#26112d; --wheel-3:#482052; --wheel-4:#2e1536; }
+ :root[data-theme="monochrome"] { --bg-dark:#050505; --bg-panel:#171717; --bg-btn:#292929; --text-main:#f5f5f5; --text-dim:#a3a3a3; --accent:#e5e5e5; --accent-rgb:229,229,229; --border:#3f3f46; --terminal-text:#e5e5e5; --terminal-glow:rgba(229,229,229,.12); --wheel-1:#2f2f2f; --wheel-2:#202020; --wheel-3:#3b3b3b; --wheel-4:#272727; }
  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
  
-body { background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; touch-action: manipulation; }
+body { background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; touch-action: pan-x pan-y pinch-zoom; }
 
  header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; position: relative; }
  h1 { font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
@@ -210,9 +229,43 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
   .hdr-btn.mic-btn.listening { animation: none; }
  }
 
+
+ .theme-picker { width:100%; max-width:1200px; margin:-10px auto 18px; padding:10px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; background:var(--bg-panel); border:1px solid var(--border); border-radius:8px; box-shadow:0 5px 18px rgba(0,0,0,.28); }
+ .theme-picker[hidden] { display:none !important; }
+ .theme-option { min-height:38px; padding:7px 8px; border:1px solid var(--border); border-radius:5px; background:var(--bg-btn); color:var(--text-main); cursor:pointer; font-size:.7rem; font-weight:700; text-transform:uppercase; transition:.18s; }
+ .theme-option:hover, .theme-option.active { border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 1px rgba(var(--accent-rgb),.14); }
+ .theme-option:focus-visible, .clear-evidence-btn:focus-visible, .cmd-copy-btn:focus-visible, .hdr-btn:focus-visible, .level-btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+ .evidence-card { position:relative; overflow:hidden; }
+ .evidence-card::before { content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--evidence-color,var(--accent)); opacity:.85; }
+ .evidence-card .ev-title { color:var(--evidence-color,var(--text-main)); }
+ .level-btn.selected { border-color:var(--evidence-color,var(--accent)); background:rgba(var(--evidence-rgb,var(--accent-rgb)),.16); box-shadow:inset 0 0 0 1px rgba(var(--evidence-rgb,var(--accent-rgb)),.13), 0 0 12px rgba(var(--evidence-rgb,var(--accent-rgb)),.08); }
+ .level-btn.lower-locked { opacity:.42; cursor:not-allowed; text-decoration:line-through; text-decoration-thickness:1px; }
+ .evidence-card-footer { margin-top:auto; padding-top:7px; display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:38px; }
+ .highest-label { color:var(--evidence-color,var(--accent)); font-size:.66rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+ .clear-evidence-btn { border:1px solid #555; background:transparent; color:var(--text-dim); min-height:32px; padding:5px 8px; border-radius:4px; font-size:.62rem; font-weight:800; text-transform:uppercase; cursor:pointer; }
+ .clear-evidence-btn:hover { border-color:var(--danger); color:var(--danger); }
+ .terminal-box { box-shadow:0 0 0 1px rgba(var(--accent-rgb),.08), 0 8px 22px rgba(0,0,0,.34), inset 0 0 28px var(--terminal-glow); overflow:hidden; }
+ .terminal-box::after { content:""; position:absolute; left:0; right:0; top:-35%; height:30%; background:linear-gradient(to bottom,transparent,rgba(var(--accent-rgb),.055),transparent); pointer-events:none; animation:terminalSweep 6s linear infinite; }
+ @keyframes terminalSweep { to { transform:translateY(470%); } }
+ .terminal-output { color:var(--terminal-text); position:relative; z-index:1; }
+ .scan-status-badge { margin-left:auto; padding:4px 7px; border:1px solid var(--border); border-radius:999px; color:var(--text-dim); background:var(--bg-btn); font-size:.62rem; white-space:nowrap; }
+ .scan-status-badge.ready { color:var(--accent); border-color:var(--accent); background:rgba(var(--accent-rgb),.11); box-shadow:0 0 10px rgba(var(--accent-rgb),.12); }
+ .command-row { padding:7px 0; border-bottom:1px dashed rgba(255,255,255,.08); }
+ .command-row:last-of-type { border-bottom:0; }
+ .command-text-wrap { display:flex; align-items:center; gap:7px; min-width:0; }
+ .command-index { color:var(--text-dim); font-size:.68rem; min-width:18px; }
+ .command-code { color:var(--terminal-text); font-family:'Consolas',monospace; overflow-wrap:anywhere; }
+ .command-actions { display:flex; gap:5px; flex-shrink:0; }
+ .cmd-copy-btn.copied { color:var(--accent); border-color:var(--accent); background:rgba(var(--accent-rgb),.10); }
+ .cmd-remove-btn { color:#ff9c9c; }
+ .cmd-remove-btn:hover { border-color:var(--danger); color:var(--danger); }
+ .ready-message { margin-top:10px; padding:8px 9px; border:1px solid var(--accent); border-radius:5px; background:rgba(var(--accent-rgb),.08); color:var(--accent); font-weight:800; text-align:center; letter-spacing:.03em; }
+ @media (prefers-reduced-motion:reduce) { .terminal-box::after { animation:none !important; display:none; } }
+ @media (max-width:700px) { .theme-picker { grid-template-columns:repeat(2,minmax(0,1fr)); } .terminal-line-row.command-row { align-items:flex-start; flex-direction:column; } .command-actions { width:100%; } .command-actions .cmd-copy-btn { flex:1; min-height:38px; } }
+
  @media (max-width: 950px) {
- header { padding-top: 56px; order: 0; }
- .header-btn-group { top: 0; left: 0; transform: none; }
+ header { padding-top: 62px; order: 0; }
+ .header-btn-group { top: 0; left: 0; right:0; transform: none; flex-wrap:wrap; }
  .mobile-jump-nav { display: flex; }
  .top-jump-nav { order: 1; margin-bottom: 20px; }
  .main-layout, .col-left, .col-right { display: contents; }
@@ -248,6 +301,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <header id="top">
  <div class="header-btn-group">
  <button class="hdr-btn" type="button" onclick="resetAll()">Reset</button>
+ <button id="themeBtn" class="hdr-btn" type="button" aria-expanded="false" aria-controls="themePicker">Theme</button>
  <button id="installBtn" class="hdr-btn install-btn" type="button" hidden>Install</button>
  <button id="micBtn" class="hdr-btn mic-btn" type="button" onclick="toggleVoice()" title="Voice Command" aria-label="Voice Command">🎤</button>
  </div>
@@ -255,6 +309,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <div id="voiceStatus" class="voice-status" aria-live="polite"></div>
  <div id="appleInstallNote" class="apple-install-note" hidden>iPhone/iPad: open the Share menu, choose <b>Add to Home Screen</b>, then tap <b>Add</b>.</div>
  </header>
+ <div id="themePicker" class="theme-picker" hidden aria-label="Choose theme"></div>
 
  <nav class="mobile-jump-nav top-jump-nav" aria-label="Jump to field notes">
  <button class="jump-btn" onclick="scrollToSection('fieldnotesSection')">Field Notes</button>
@@ -273,7 +328,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <div>
  <span class="rules-category">Investigation & Evidence</span>
  <ul class="rules-content">
- <li>Goal: Find the ghost's characteristics (the highest evidence level for each type), not a ghost "type".</li>
+ <li>Goal: Find the ghost's characteristics (the highest evidence level for each type), not a ghost "type". Once a higher level is observed, lower readings can be ignored.</li>
  <li>Listen for interactions anywhere, scan the item the ghost interacted with to find evidence.</li>
  <li>Evidence can spawn anywhere, but becomes more common in the favorite room over time.</li>
  <li>Favorite room will drop to the lowest temperature. Do not mistake cold spot evidence for base room temp.</li>
@@ -285,7 +340,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <ul class="rules-content">
  <li><b>HELP:</b> Information on how to use the device.</li>
  <li><b>ADD:</b> Adds an evidence type and level (ex. ADD EMF 3). To update a level, simply use ADD again with the new level.</li>
- <li><b>REMOVE:</b> Removes an evidence type without needing the level (ex. REMOVE UV).</li>
+ <li><b>REMOVE:</b> Clears an evidence entry from the Affixer and includes the level currently entered (ex. REMOVE UV 2).</li>
  <li><b>INFO:</b> Gets info about a specific evidence without needing the level (ex. INFO WRITING).</li>
  <li><b>SCAN:</b> Begins the scanning process.</li>
  </ul>
@@ -293,11 +348,11 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <div>
  <span class="rules-category">Scan Status Colors</span>
  <ul class="rules-content">
- <li><b style="color:#60a5fa;">Blue: Stationary:</b> Normal. Awaiting input.</li>
- <li><b style="color:#60a5fa;">Blue: Rotating:</b> Scanning.</li>
- <li><b style="color:var(--warning);">Yellow:</b> Loss of proximity personnel. 1 team member must remain within 16 feet/5 meters. Check range when placing the affixer.</li>
- <li><b style="color:var(--danger);">Red:</b> Failed scan. This status immediately starts a hunt.</li>
- <li><b style="color:var(--accent);">Green:</b> Successful scan.</li>
+ <li><b style="color:var(--status-blue);">Blue: Stationary:</b> Normal. Awaiting input.</li>
+ <li><b style="color:var(--status-blue);">Blue: Rotating:</b> Scanning.</li>
+ <li><b style="color:var(--status-yellow);">Yellow:</b> Loss of proximity personnel. 1 team member must remain within 16 feet/5 meters. Check range when placing the affixer.</li>
+ <li><b style="color:var(--status-red);">Red:</b> Failed scan. This status immediately starts a hunt.</li>
+ <li><b style="color:var(--status-green);">Green:</b> Successful scan.</li>
  </ul>
  </div>
  <div>
@@ -305,7 +360,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <ul class="rules-content">
  <li><b>Battery:</b> Each scan uses battery power. Charge device at your vehicle when battery is too low to scan again.</li>
  <li><b>Novice & Intermediate:</b> Input as many evidence types as you want. If minimum characteristics are met, the scan succeeds and overrules incorrect inputs.</li>
- <li><b>Expert & Master:</b> All inputted characteristics must be correct for the scan to succeed. Avoid putting all 6 to lessen risk of failed scan.</li>
+ <li><b>Expert & Master:</b> All inputted characteristics must be correct for the scan to succeed. Avoid putting all 7 to lessen risk of failed scan.</li>
  <li><b>E.A.L. (Buzz-Stick):</b> Use after a successful scan. It glows brighter when close to an artifact, and flashes when very close.</li>
  <li><b>Completion:</b> Find all artifacts to cleanse the ghost, or take the Optional Exit after a successful scan for a partial reward.</li>
  </ul>
@@ -317,7 +372,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <div class="col-right">
  <div class="box-terminal terminal-box" id="terminalSection">
  <div class="terminal-header">
- <span>Input Commands</span>
+ <span>Affixer Command Queue</span>
+ <span id="scanStatusBadge" class="scan-status-badge">Awaiting Evidence</span>
  </div>
  <div class="terminal-output" id="terminalOutput"></div>
  </div>
@@ -459,6 +515,11 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  { level: 1, text: "Incomprehensible Scribbling (Chaotic)" },
  { level: 2, text: "Symbolic Enigmas (Shapes/Stars)" },
  { level: 3, text: "Hostile Manifestations (Threatening Words)" }
+ ],
+ "Ghost Orb": [
+ { level: 1, text: "Mist (Faint cloud of energy)" },
+ { level: 2, text: "Weak Orb (Hollow ring around an unstable core)" },
+ { level: 3, text: "Strong Orb (Fully manifested orb with visible outer ring)" }
  ]
  };
 
@@ -472,6 +533,11 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  "Level 1: Incomprehensible Scribbling": ["Writing_1.webp", "Writing_1.1.webp", "Writing_1.2.webp"],
  "Level 2: Symbolic Enigmas": ["Writing_2.webp", "Writing_2.1.webp", "Writing_2.2.webp", "Writing_2.3.webp", "Writing_2.4.webp"],
  "Level 3: Hostile Manifestations": ["Writing_3.webp", "Writing_3.1.webp"]
+ },
+ "Ghost Orb": {
+ "Level 1: Mist": ["GOlvl1.webp"],
+ "Level 2: Weak Orb": ["GOlvl2.webp"],
+ "Level 3: Strong Orb": ["GOlvl3.webp"]
  }
  };
 
@@ -498,7 +564,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  "#ff66cc",
  "#4ecdc4"
  ],
- sliceColors: ["#2c2c2c", "#1e1e1e", "#383838", "#222222"]
+ sliceColors: ["--wheel-1", "--wheel-2", "--wheel-3", "--wheel-4"]
  };
 
  const selectedMaps = new Set(wheelData.maps);
@@ -507,6 +573,27 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  let wheelSpinId = 0;
  let currentDifficulty = "Master";
  let selectedEvidence = {};
+ const copiedCommands = new Set();
+ const affixerEvidenceNames = { "Ghost Orb": "ORB" };
+ const evidenceColors = {
+  EMF: ["#f59e0b", "245,158,11"],
+  Thermal: ["#38bdf8", "56,189,248"],
+  Radiation: ["#a3e635", "163,230,53"],
+  UV: ["#a855f7", "168,85,247"],
+  Audio: ["#22d3ee", "34,211,238"],
+  Writing: ["#f87171", "248,113,113"],
+  "Ghost Orb": ["#ff66cc", "255,102,204"]
+ };
+ const themes = [
+  ["spectral-green", "Spectral Green"],
+  ["uv-violet", "UV Violet"],
+  ["cold-spot", "Cold Spot"],
+  ["radiation", "Radiation"],
+  ["amber-terminal", "Amber Terminal"],
+  ["blood-moon", "Blood Moon"],
+  ["ghost-orb", "Ghost Orb"],
+  ["monochrome", "Monochrome"]
+ ];
 
  let recognition = null;
  let isListening = false;
@@ -554,16 +641,74 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  textArea.remove();
  }
 
- const originalText = btnElement.innerText;
- btnElement.innerText = copied ? "COPIED!" : "COPY FAILED";
- btnElement.style.borderColor = copied ? "#10b981" : "#ef4444";
- btnElement.style.color = copied ? "#10b981" : "#ef4444";
+ if (copied) {
+  copiedCommands.add(cmdText);
+  btnElement.classList.add("copied");
+  btnElement.textContent = "✓ Copied";
+  btnElement.setAttribute("aria-label", `${cmdText} copied`);
+ } else {
+  const originalText = btnElement.textContent;
+  btnElement.textContent = "Copy Failed";
+  btnElement.style.borderColor = "var(--danger)";
+  btnElement.style.color = "var(--danger)";
+  setTimeout(() => {
+   btnElement.textContent = originalText;
+   btnElement.style.borderColor = "";
+   btnElement.style.color = "";
+  }, 1200);
+ }
+ }
 
- setTimeout(() => {
- btnElement.innerText = originalText;
- btnElement.style.borderColor = "#444";
- btnElement.style.color = "var(--accent)";
- }, 1200);
+ function applyTheme(themeId) {
+ const validTheme = themes.some(([id]) => id === themeId) ? themeId : "spectral-green";
+ if (validTheme === "spectral-green") document.documentElement.removeAttribute("data-theme");
+ else document.documentElement.setAttribute("data-theme", validTheme);
+ try { localStorage.setItem("ass-profiler-theme", validTheme); } catch (_) {}
+ const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+ const themeMeta = document.querySelector('meta[name="theme-color"]');
+ if (themeMeta && accent) themeMeta.setAttribute("content", accent);
+ document.querySelectorAll(".theme-option").forEach(button => {
+  const active = button.dataset.theme === validTheme;
+  button.classList.toggle("active", active);
+  button.setAttribute("aria-pressed", String(active));
+ });
+ drawWheel();
+ }
+
+ function initThemes() {
+ const picker = document.getElementById("themePicker");
+ const button = document.getElementById("themeBtn");
+ if (!picker || !button) return;
+ picker.replaceChildren();
+ themes.forEach(([id, label]) => {
+  const option = createElement("button", "theme-option", label, () => { applyTheme(id); picker.hidden = true; button.setAttribute("aria-expanded", "false"); });
+  option.dataset.theme = id;
+  option.setAttribute("aria-pressed", "false");
+  picker.appendChild(option);
+ });
+ button.addEventListener("click", () => {
+  picker.hidden = !picker.hidden;
+  button.setAttribute("aria-expanded", String(!picker.hidden));
+  if (!picker.hidden) picker.querySelector(".theme-option.active")?.focus();
+ });
+ let saved = "spectral-green";
+ try { saved = localStorage.getItem("ass-profiler-theme") || saved; } catch (_) {}
+ applyTheme(saved);
+ }
+
+ function clearCopiedForEvidence(type) {
+ const prefix = affixerEvidenceNames[type] || type.toUpperCase();
+ [...copiedCommands].forEach(command => {
+  if (command.startsWith(`ADD ${prefix} `) || command.startsWith(`REMOVE ${prefix} `)) copiedCommands.delete(command);
+ });
+ }
+
+ function clearEvidence(type) {
+ if (!(type in selectedEvidence)) return;
+ delete selectedEvidence[type];
+ clearCopiedForEvidence(type);
+ renderEvidence();
+ updateTerminal();
  }
 
  function initVoiceRecognition() {
@@ -657,9 +802,13 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  }
 
  function setEvidenceVoice(type, level) {
- selectedEvidence[type] = level;
- renderEvidence();
- updateTerminal();
+ const current = selectedEvidence[type] || 0;
+ if (level > current) {
+  selectedEvidence[type] = level;
+  clearCopiedForEvidence(type);
+  renderEvidence();
+  updateTerminal();
+ }
  }
 
  function parseVoiceCommand(text) {
@@ -719,8 +868,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  // 1. Radiation
  if (cleanText.includes("radiation") || cleanText.includes("geiger") || /\brad\b/.test(cleanText)) {
  if (cleanText.includes("remove") || cleanText.includes("clear")) {
- delete selectedEvidence["Radiation"];
- renderEvidence(); updateTerminal(); return;
+ clearEvidence("Radiation"); return;
  }
  if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("Radiation", spokenLevel); return; }
  let nums = cleanText.match(/\d+/g);
@@ -738,8 +886,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  // 2. Thermal / Temperature
  if (cleanText.includes("thermal") || cleanText.includes("temperature") || cleanText.includes("temp") || cleanText.includes("degrees") || cleanText.includes("celsius") || cleanText.includes("fahrenheit")) {
  if (cleanText.includes("remove") || cleanText.includes("clear")) {
- delete selectedEvidence["Thermal"];
- renderEvidence(); updateTerminal(); return;
+ clearEvidence("Thermal"); return;
  }
  if (spokenLevel && spokenLevel <= 4) { setEvidenceVoice("Thermal", spokenLevel); return; }
  let numMatch = cleanText.match(/(-?\d+(\.\d+)?)/);
@@ -771,8 +918,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  // 3. EMF
  if (cleanText.includes("emf") || cleanText.includes("e m f") || cleanText.includes("field")) {
  if (cleanText.includes("remove") || cleanText.includes("clear")) {
- delete selectedEvidence["EMF"];
- renderEvidence(); updateTerminal(); return;
+ clearEvidence("EMF"); return;
  }
  if (spokenLevel && spokenLevel <= 4) { setEvidenceVoice("EMF", spokenLevel); return; }
  let numMatch = cleanText.match(/(\d+(\.\d+)?)/);
@@ -792,8 +938,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  // 4. UV
  if (cleanText.includes("uv") || cleanText.includes("ultraviolet") || cleanText.includes("fingerprints")) {
  if (cleanText.includes("remove") || cleanText.includes("clear")) {
- delete selectedEvidence["UV"];
- renderEvidence(); updateTerminal(); return;
+ clearEvidence("UV"); return;
  }
  if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("UV", spokenLevel); return; }
  if (cleanText.includes("handprints") || cleanText.includes("clear") || cleanText.includes("patterns") || cleanText.includes("level 3")) { setEvidenceVoice("UV", 3); return; }
@@ -801,11 +946,21 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  if (cleanText.includes("faint") || cleanText.includes("spray") || cleanText.includes("splotches") || cleanText.includes("traces") || cleanText.includes("level 1")) { setEvidenceVoice("UV", 1); return; }
  }
 
- // 5. Audio
+ // 5. Ghost Orb
+ if (cleanText.includes("ghost orb") || cleanText.includes("orb") || cleanText.includes("mist")) {
+ if (cleanText.includes("remove") || cleanText.includes("clear")) {
+ clearEvidence("Ghost Orb"); return;
+ }
+ if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("Ghost Orb", spokenLevel); return; }
+ if (cleanText.includes("strong orb") || cleanText.includes("strong") || cleanText.includes("level 3")) { setEvidenceVoice("Ghost Orb", 3); return; }
+ if (cleanText.includes("weak orb") || cleanText.includes("weak") || cleanText.includes("level 2")) { setEvidenceVoice("Ghost Orb", 2); return; }
+ if (cleanText.includes("mist") || cleanText.includes("level 1")) { setEvidenceVoice("Ghost Orb", 1); return; }
+ }
+
+ // 6. Audio
  if (cleanText.includes("audio") || cleanText.includes("sound") || cleanText.includes("spirit box")) {
  if (cleanText.includes("remove") || cleanText.includes("clear")) {
- delete selectedEvidence["Audio"];
- renderEvidence(); updateTerminal(); return;
+ clearEvidence("Audio"); return;
  }
  if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("Audio", spokenLevel); return; }
  if (cleanText.includes("intelligible phrases") || cleanText.includes("phrases") || cleanText.includes("sentences") || cleanText.includes("level 3")) { setEvidenceVoice("Audio", 3); return; }
@@ -813,11 +968,10 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  if (cleanText.includes("unintelligible") || cleanText.includes("noises") || cleanText.includes("level 1")) { setEvidenceVoice("Audio", 1); return; }
  }
 
- // 6. Writing
+ // 7. Writing
  if (cleanText.includes("writing") || cleanText.includes("book")) {
  if (cleanText.includes("remove") || cleanText.includes("clear")) {
- delete selectedEvidence["Writing"];
- renderEvidence(); updateTerminal(); return;
+ clearEvidence("Writing"); return;
  }
  if (spokenLevel && spokenLevel <= 3) { setEvidenceVoice("Writing", spokenLevel); return; }
  if (cleanText.includes("threatening") || cleanText.includes("hostile") || cleanText.includes("words") || cleanText.includes("level 3")) { setEvidenceVoice("Writing", 3); return; }
@@ -892,6 +1046,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  }
 
  function init() {
+ initThemes();
  renderDifficulty();
  renderEvidence();
  updateTerminal();
@@ -1025,7 +1180,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  context.moveTo(centerX, centerY);
  context.arc(centerX, centerY, radius, startAngle, endAngle);
  context.closePath();
- context.fillStyle = wheelData.sliceColors[index % wheelData.sliceColors.length];
+ const wheelVar = wheelData.sliceColors[index % wheelData.sliceColors.length];
+ context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(wheelVar).trim() || "#2c2c2c";
  context.fill();
  context.strokeStyle = "#333";
  context.lineWidth = 1.5;
@@ -1118,17 +1274,28 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  grid.replaceChildren();
 
  Object.entries(evidenceData).forEach(([type, levels]) => {
+ const currentLevel = selectedEvidence[type] || 0;
  const card = createElement("div", "evidence-card");
+ const [color, rgb] = evidenceColors[type] || ["var(--accent)", "var(--accent-rgb)"];
+ card.style.setProperty("--evidence-color", color);
+ card.style.setProperty("--evidence-rgb", rgb);
  card.appendChild(createElement("div", "ev-title", type));
 
  levels.forEach(({ level, text }) => {
- const className = `level-btn ${selectedEvidence[type] === level ? "selected" : ""}`;
+ const isSelected = currentLevel === level;
+ const isLowerLocked = currentLevel > level;
+ const className = `level-btn ${isSelected ? "selected" : ""} ${isLowerLocked ? "lower-locked" : ""}`.trim();
  const button = createElement(
  "button",
  className,
  `Level ${level}: ${text}`,
  () => selectEvidence(type, level)
  );
+ button.setAttribute("aria-pressed", String(isSelected));
+ if (isLowerLocked) {
+  button.disabled = true;
+  button.title = `Level ${currentLevel} is already the highest observed ${type}.`;
+ }
  card.appendChild(button);
  });
 
@@ -1142,80 +1309,103 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  card.appendChild(referenceButton);
  }
 
+ const footer = createElement("div", "evidence-card-footer");
+ const state = createElement("span", "highest-label", currentLevel ? `Highest Observed: Level ${currentLevel}` : "No Evidence Marked");
+ footer.appendChild(state);
+ if (currentLevel) {
+  const clearButton = createElement("button", "clear-evidence-btn", "Clear", () => clearEvidence(type));
+  clearButton.setAttribute("aria-label", `Clear ${type} evidence from the tracker`);
+  footer.appendChild(clearButton);
+ }
+ card.appendChild(footer);
  grid.appendChild(card);
  });
  }
 
  function selectEvidence(type, level) {
- if (selectedEvidence[type] === level) {
- delete selectedEvidence[type];
- } else {
+ const current = selectedEvidence[type] || 0;
+ if (level <= current) return;
  selectedEvidence[type] = level;
- }
-
+ clearCopiedForEvidence(type);
  renderEvidence();
  updateTerminal();
  }
 
  function updateTerminal() {
  const output = document.getElementById("terminalOutput");
+ const badge = document.getElementById("scanStatusBadge");
  const requirement = difficultyRequirements[currentDifficulty];
  const entries = Object.entries(selectedEvidence);
+ const ready = entries.length >= requirement;
 
+ if (badge) {
+  badge.textContent = ready ? "READY TO SCAN" : entries.length ? `${entries.length} / ${requirement} REQUIRED` : "AWAITING EVIDENCE";
+  badge.classList.toggle("ready", ready);
+ }
+ if (!ready) copiedCommands.delete("SCAN");
  output.replaceChildren();
 
  if (entries.length === 0) {
- const defaultText = createElement("div", undefined, `> Awaiting data input...\n> Minimum evidence required: ${requirement}`);
+ const defaultText = createElement("div", undefined, `> Awaiting data input...\
+> Minimum evidence required: ${requirement}`);
  defaultText.style.whiteSpace = "pre-line";
  output.appendChild(defaultText);
  return;
  }
 
- entries.forEach(([type, level]) => {
- const cmdText = `ADD ${type.toUpperCase()} ${level}`;
- const row = createElement("div", "terminal-line-row");
- 
-const textSpan = createElement("span", undefined, `> ${cmdText}`);
- textSpan.style.color = "#00ff00";
+ entries.forEach(([type, level], index) => {
+ const machineType = affixerEvidenceNames[type] || type.toUpperCase();
+ const addCommand = `ADD ${machineType} ${level}`;
+ const removeCommand = `REMOVE ${machineType} ${level}`;
+ const row = createElement("div", "terminal-line-row command-row");
+ const textWrap = createElement("div", "command-text-wrap");
+ textWrap.appendChild(createElement("span", "command-index", `${index + 1}.`));
+ textWrap.appendChild(createElement("span", "command-code", addCommand));
 
- const copyBtn = createElement("button", "cmd-copy-btn", "📋 Copy", () => {
- copySingleCommand(cmdText, copyBtn);
- });
-
- row.appendChild(textSpan);
- row.appendChild(copyBtn);
+ const actions = createElement("div", "command-actions");
+ const addCopied = copiedCommands.has(addCommand);
+ const addBtn = createElement("button", `cmd-copy-btn ${addCopied ? "copied" : ""}`.trim(), addCopied ? "✓ Copied" : "Copy Add", () => copySingleCommand(addCommand, addBtn));
+ addBtn.setAttribute("aria-label", `Copy ${addCommand}`);
+ const removeCopied = copiedCommands.has(removeCommand);
+ const removeBtn = createElement("button", `cmd-copy-btn cmd-remove-btn ${removeCopied ? "copied" : ""}`.trim(), removeCopied ? "✓ Copied" : "Copy Remove", () => copySingleCommand(removeCommand, removeBtn));
+ removeBtn.setAttribute("aria-label", `Copy ${removeCommand}`);
+ removeBtn.title = `Copies only: ${removeCommand}`;
+ actions.appendChild(addBtn);
+ actions.appendChild(removeBtn);
+ row.appendChild(textWrap);
+ row.appendChild(actions);
  output.appendChild(row);
  });
 
+ if (!ready) {
  const statusDiv = createElement("div");
  statusDiv.style.marginTop = "10px";
-
- if (entries.length < requirement) {
  statusDiv.textContent = `[System] Need ${requirement - entries.length} more characteristic(s) to scan.`;
- statusDiv.style.color = "#00ff00";
+ statusDiv.style.color = "var(--terminal-text)";
  output.appendChild(statusDiv);
- } else {
- const scanRow = createElement("div", "terminal-line-row");
- scanRow.style.marginTop = "8px";
- scanRow.style.borderTop = "1px dashed #333";
- scanRow.style.paddingTop = "6px";
-
- const scanSpan = createElement("span", undefined, "> SCAN");
- scanSpan.style.color = "#10b981";
- scanSpan.style.fontWeight = "bold";
-
- const scanCopyBtn = createElement("button", "cmd-copy-btn", "📋 Copy SCAN", () => {
- copySingleCommand("SCAN", scanCopyBtn);
- });
-
- scanRow.appendChild(scanSpan);
- scanRow.appendChild(scanCopyBtn);
- output.appendChild(scanRow);
+ return;
  }
+
+ const readyMessage = createElement("div", "ready-message", `READY TO SCAN • ${entries.length} CHARACTERISTIC${entries.length === 1 ? "" : "S"} MARKED`);
+ output.appendChild(readyMessage);
+ const scanRow = createElement("div", "terminal-line-row command-row");
+ scanRow.style.marginTop = "8px";
+ const scanWrap = createElement("div", "command-text-wrap");
+ scanWrap.appendChild(createElement("span", "command-index", "FINAL"));
+ scanWrap.appendChild(createElement("span", "command-code", "SCAN"));
+ const scanActions = createElement("div", "command-actions");
+ const scanCopied = copiedCommands.has("SCAN");
+ const scanCopyBtn = createElement("button", `cmd-copy-btn ${scanCopied ? "copied" : ""}`.trim(), scanCopied ? "✓ Copied" : "Copy SCAN", () => copySingleCommand("SCAN", scanCopyBtn));
+ scanCopyBtn.setAttribute("aria-label", "Copy SCAN");
+ scanActions.appendChild(scanCopyBtn);
+ scanRow.appendChild(scanWrap);
+ scanRow.appendChild(scanActions);
+ output.appendChild(scanRow);
  }
 
  function resetAll() {
  selectedEvidence = {};
+ copiedCommands.clear();
  wheelSpinId++;
  isSpinning = false;
  currentWheelAngle = 0;
