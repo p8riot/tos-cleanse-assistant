@@ -45,7 +45,10 @@
  
 body { background-color: var(--bg-dark); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; min-height: 100vh; touch-action: pan-x pan-y pinch-zoom; }
 
- header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; position: relative; }
+ /* Temporarily hidden until the reworked difficulty/custom settings are remapped. */
+.legacy-difficulty-ui { display: none !important; }
+
+header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; position: relative; }
  h1 { font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
 
  .header-btn-group {
@@ -315,7 +318,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <button class="jump-btn" onclick="scrollToSection('fieldnotesSection')">Field Notes</button>
  </nav>
 
- <div class="difficulty-container" id="diffContainer"></div>
+ <div class="difficulty-container legacy-difficulty-ui" id="diffContainer" aria-hidden="true"></div>
 
  <div class="main-layout">
  
@@ -359,8 +362,8 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <span class="rules-category">System, Logic & Cleansing</span>
  <ul class="rules-content">
  <li><b>Battery:</b> Each scan uses battery power. Charge device at your vehicle when battery is too low to scan again.</li>
- <li><b>Novice & Intermediate:</b> Input as many evidence types as you want. If minimum characteristics are met, the scan succeeds and overrules incorrect inputs.</li>
- <li><b>Expert & Master:</b> All inputted characteristics must be correct for the scan to succeed. Avoid putting all 7 to lessen risk of failed scan.</li>
+ <li class="legacy-difficulty-ui"><b>Novice & Intermediate:</b> Input as many evidence types as you want. If minimum characteristics are met, the scan succeeds and overrules incorrect inputs.</li>
+ <li class="legacy-difficulty-ui"><b>Expert & Master:</b> All inputted characteristics must be correct for the scan to succeed. Avoid putting all 7 to lessen risk of failed scan.</li>
  <li><b>E.A.L. (Buzz-Stick):</b> Use after a successful scan. It glows brighter when close to an artifact, and flashes when very close.</li>
  <li><b>Completion:</b> Find all artifacts to cleanse the ghost, or take the Optional Exit after a successful scan for a partial reward.</li>
  </ul>
@@ -378,7 +381,7 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  <div class="terminal-output" id="terminalOutput"></div>
  </div>
 
- <div class="box-artifacts info-box">
+ <div class="box-artifacts info-box legacy-difficulty-ui" aria-hidden="true">
  <h3>Artifact Spawns</h3>
  <div class="artifact-note-row">
  <span style="color: var(--text-dim);">Novice</span> <span style="color: var(--accent);">2 Artifacts</span>
@@ -1334,60 +1337,49 @@ body { background-color: var(--bg-dark); color: var(--text-main); display: flex;
  function updateTerminal() {
  const output = document.getElementById("terminalOutput");
  const badge = document.getElementById("scanStatusBadge");
- const requirement = difficultyRequirements[currentDifficulty];
  const entries = Object.entries(selectedEvidence);
- const ready = entries.length >= requirement;
 
  if (badge) {
-  badge.textContent = ready ? "READY TO SCAN" : entries.length ? `${entries.length} / ${requirement} REQUIRED` : "AWAITING EVIDENCE";
-  badge.classList.toggle("ready", ready);
+  badge.textContent = entries.length
+   ? `${entries.length} CHARACTERISTIC${entries.length === 1 ? "" : "S"} MARKED`
+   : "AWAITING EVIDENCE";
+  badge.classList.remove("ready");
  }
- if (!ready) copiedCommands.delete("SCAN");
  output.replaceChildren();
 
  if (entries.length === 0) {
- const defaultText = createElement("div", undefined, `> Awaiting data input...\
-> Minimum evidence required: ${requirement}`);
- defaultText.style.whiteSpace = "pre-line";
- output.appendChild(defaultText);
- return;
+  const defaultText = createElement("div", undefined, "> Awaiting data input...");
+  output.appendChild(defaultText);
+  return;
  }
 
  entries.forEach(([type, level], index) => {
- const machineType = affixerEvidenceNames[type] || type.toUpperCase();
- const addCommand = `ADD ${machineType} ${level}`;
- const removeCommand = `REMOVE ${machineType} ${level}`;
- const row = createElement("div", "terminal-line-row command-row");
- const textWrap = createElement("div", "command-text-wrap");
- textWrap.appendChild(createElement("span", "command-index", `${index + 1}.`));
- textWrap.appendChild(createElement("span", "command-code", addCommand));
+  const machineType = affixerEvidenceNames[type] || type.toUpperCase();
+  const addCommand = `ADD ${machineType} ${level}`;
+  const removeCommand = `REMOVE ${machineType} ${level}`;
+  const row = createElement("div", "terminal-line-row command-row");
+  const textWrap = createElement("div", "command-text-wrap");
+  textWrap.appendChild(createElement("span", "command-index", `${index + 1}.`));
+  textWrap.appendChild(createElement("span", "command-code", addCommand));
 
- const actions = createElement("div", "command-actions");
- const addCopied = copiedCommands.has(addCommand);
- const addBtn = createElement("button", `cmd-copy-btn ${addCopied ? "copied" : ""}`.trim(), addCopied ? "✓ Copied" : "Copy Add", () => copySingleCommand(addCommand, addBtn));
- addBtn.setAttribute("aria-label", `Copy ${addCommand}`);
- const removeCopied = copiedCommands.has(removeCommand);
- const removeBtn = createElement("button", `cmd-copy-btn cmd-remove-btn ${removeCopied ? "copied" : ""}`.trim(), removeCopied ? "✓ Copied" : "Copy Remove", () => copySingleCommand(removeCommand, removeBtn));
- removeBtn.setAttribute("aria-label", `Copy ${removeCommand}`);
- removeBtn.title = `Copies only: ${removeCommand}`;
- actions.appendChild(addBtn);
- actions.appendChild(removeBtn);
- row.appendChild(textWrap);
- row.appendChild(actions);
- output.appendChild(row);
+  const actions = createElement("div", "command-actions");
+  const addCopied = copiedCommands.has(addCommand);
+  const addBtn = createElement("button", `cmd-copy-btn ${addCopied ? "copied" : ""}`.trim(), addCopied ? "✓ Copied" : "Copy Add", () => copySingleCommand(addCommand, addBtn));
+  addBtn.setAttribute("aria-label", `Copy ${addCommand}`);
+  const removeCopied = copiedCommands.has(removeCommand);
+  const removeBtn = createElement("button", `cmd-copy-btn cmd-remove-btn ${removeCopied ? "copied" : ""}`.trim(), removeCopied ? "✓ Copied" : "Copy Remove", () => copySingleCommand(removeCommand, removeBtn));
+  removeBtn.setAttribute("aria-label", `Copy ${removeCommand}`);
+  removeBtn.title = `Copies only: ${removeCommand}`;
+  actions.appendChild(addBtn);
+  actions.appendChild(removeBtn);
+  row.appendChild(textWrap);
+  row.appendChild(actions);
+  output.appendChild(row);
  });
 
- if (!ready) {
- const statusDiv = createElement("div");
- statusDiv.style.marginTop = "10px";
- statusDiv.textContent = `[System] Need ${requirement - entries.length} more characteristic(s) to scan.`;
- statusDiv.style.color = "var(--terminal-text)";
- output.appendChild(statusDiv);
- return;
- }
-
- const readyMessage = createElement("div", "ready-message", `READY TO SCAN • ${entries.length} CHARACTERISTIC${entries.length === 1 ? "" : "S"} MARKED`);
- output.appendChild(readyMessage);
+ // Difficulty requirements are temporarily disabled because the game now supports
+ // reworked and custom difficulty settings. SCAN remains available without the
+ // tool making assumptions about how many characteristics the current contract needs.
  const scanRow = createElement("div", "terminal-line-row command-row");
  scanRow.style.marginTop = "8px";
  const scanWrap = createElement("div", "command-text-wrap");
