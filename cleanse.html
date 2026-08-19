@@ -224,7 +224,19 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
 .gallery-level-section { margin-bottom: 40px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
  .gallery-level-title { font-size: 1.2rem; color: #fff; margin-bottom: 15px; font-weight: bold; }
  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; justify-items: center; }
- .gallery-img { width: 100%; max-width: 160px; height: auto; border: 1px solid #444; border-radius: 4px; object-fit: cover; }
+ .gallery-image-button { width:100%; max-width:160px; padding:0; border:1px solid #444; border-radius:4px; background:transparent; cursor:zoom-in; overflow:hidden; line-height:0; }
+ .gallery-image-button:hover { border-color:var(--accent); box-shadow:0 0 0 1px rgba(var(--accent-rgb),.18); }
+ .gallery-image-button:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+ .gallery-img { display:block; width:100%; height:auto; border:0; border-radius:3px; object-fit:cover; }
+ .gallery-enlarge-hint { width:100%; margin-top:10px; color:var(--text-dim); font-size:.7rem; text-align:center; font-style:italic; }
+
+ .image-lightbox { display:none; position:fixed; inset:0; z-index:250; background:rgba(0,0,0,.97); align-items:center; justify-content:center; padding:64px 18px 24px; }
+ .image-lightbox.active { display:flex; }
+ .image-lightbox-inner { max-width:100%; max-height:100%; display:flex; align-items:center; justify-content:center; }
+ .image-lightbox-img { display:block; max-width:95vw; max-height:88vh; width:auto; height:auto; object-fit:contain; border:1px solid #555; border-radius:6px; box-shadow:0 10px 40px rgba(0,0,0,.6); touch-action:pan-x pan-y pinch-zoom; }
+ .image-lightbox-close { position:fixed; top:14px; right:18px; z-index:251; width:48px; height:48px; border:0; background:transparent; color:#fff; font-size:42px; line-height:1; cursor:pointer; border-radius:6px; }
+ .image-lightbox-close:hover { color:var(--danger); }
+ .image-lightbox-close:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 
 
  @media (prefers-reduced-motion: reduce) {
@@ -491,6 +503,13 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  </div>
  </div>
 
+ <div id="imageLightbox" class="image-lightbox" onclick="closeImageLightbox(event)" role="dialog" aria-modal="true" aria-label="Enlarged reference image" aria-hidden="true">
+ <button id="imageLightboxClose" class="image-lightbox-close" type="button" onclick="closeImageLightbox(event)" aria-label="Close enlarged image">×</button>
+ <div class="image-lightbox-inner">
+ <img id="imageLightboxImg" class="image-lightbox-img" alt="">
+ </div>
+ </div>
+
  <script>
  const difficultyRequirements = {
  Novice: 2,
@@ -551,9 +570,9 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  "Level 3: Hostile Manifestations": ["Writing_3.webp", "Writing_3.1.webp"]
  },
  "Ghost Orb": {
- "Level 1: Mist": ["GOlvl1.webp"],
- "Level 2: Weak Orb": ["GOlvl2.webp"],
- "Level 3: Strong Orb": ["GOlvl3.webp"]
+ "Level 1: Mist": ["GOlvl1.png"],
+ "Level 2: Weak Orb": ["GOlvl2.png"],
+ "Level 3: Strong Orb": ["GOlvl3.png", "GOlvl3listo.png"]
  }
  };
 
@@ -615,6 +634,7 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  let isListening = false;
  let deferredInstallPrompt = null;
  let modalReturnFocus = null;
+ let lightboxReturnFocus = null;
 
  function createElement(tagName, className, text, onClick) {
  const element = document.createElement(tagName);
@@ -1418,6 +1438,41 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  window.scrollTo({ top: 0, behavior: 'smooth' });
  }
 
+ function openImageLightbox(imageSource, altText, returnFocus) {
+ const lightbox = document.getElementById("imageLightbox");
+ const fullImage = document.getElementById("imageLightboxImg");
+ if (!lightbox || !fullImage) return;
+
+ lightboxReturnFocus = returnFocus || document.activeElement;
+ fullImage.src = imageSource;
+ fullImage.alt = altText || "Enlarged visual reference";
+ lightbox.classList.add("active");
+ lightbox.setAttribute("aria-hidden", "false");
+ requestAnimationFrame(() => document.getElementById("imageLightboxClose")?.focus());
+ }
+
+ function closeImageLightbox(event = null) {
+ const lightbox = document.getElementById("imageLightbox");
+ if (!lightbox?.classList.contains("active")) return;
+
+ if (event) {
+ const clickedBackdrop = event.target === lightbox;
+ const clickedCloseButton = event.target.closest?.('.image-lightbox-close');
+ if (!clickedBackdrop && !clickedCloseButton) return;
+ event.stopPropagation();
+ }
+
+ lightbox.classList.remove("active");
+ lightbox.setAttribute("aria-hidden", "true");
+ const fullImage = document.getElementById("imageLightboxImg");
+ if (fullImage) { fullImage.removeAttribute("src"); fullImage.alt = ""; }
+ const returnTarget = lightboxReturnFocus;
+ lightboxReturnFocus = null;
+ if (returnTarget && typeof returnTarget.focus === "function" && document.contains(returnTarget)) {
+ requestAnimationFrame(() => returnTarget.focus());
+ }
+ }
+
  function openModal(type) {
  const modal = document.getElementById("imageModal");
  const title = document.getElementById("modalTitle");
@@ -1436,13 +1491,23 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
 
  const grid = createElement("div", "gallery-grid");
  images.forEach(imageSource => {
+ const altText = `${type} ${levelName} visual reference`;
+ const imageButton = createElement("button", "gallery-image-button");
+ imageButton.setAttribute("aria-label", `Enlarge ${altText}`);
+ imageButton.title = "Click or tap to enlarge";
  const image = createElement("img", "gallery-img");
  image.src = imageSource;
- image.alt = `${type} ${levelName} visual reference`;
- grid.appendChild(image);
+ image.alt = altText;
+ imageButton.appendChild(image);
+ imageButton.addEventListener("click", event => {
+ event.stopPropagation();
+ openImageLightbox(imageSource, altText, imageButton);
+ });
+ grid.appendChild(imageButton);
  });
 
  section.appendChild(grid);
+ section.appendChild(createElement("div", "gallery-enlarge-hint", "Click or tap an image to enlarge"));
  container.appendChild(section);
  });
 
@@ -1471,6 +1536,20 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  }
 
  document.addEventListener('keydown', event => {
+ const lightbox = document.getElementById('imageLightbox');
+ if (lightbox?.classList.contains('active')) {
+  if (event.key === 'Escape') {
+   event.preventDefault();
+   closeImageLightbox();
+   return;
+  }
+  if (event.key === 'Tab') {
+   event.preventDefault();
+   document.getElementById('imageLightboxClose')?.focus();
+  }
+  return;
+ }
+
  const modal = document.getElementById('imageModal');
  if (!modal?.classList.contains('active')) return;
 
