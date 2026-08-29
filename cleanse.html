@@ -234,8 +234,12 @@ header { width: 100%; max-width: 1200px; text-align: center; margin-bottom: 20px
  .ghost-orb-animation-button { width:min(100%,720px); max-width:720px; }
  .ghost-orb-animation-button .gallery-img { width:100%; }
  @media (max-width:760px) {
-  .compact-gallery-levels-grid { grid-template-columns:1fr; }
-  .compact-gallery-levels-grid .gallery-grid { grid-template-columns:1fr; justify-items:center; }
+  .compact-gallery-levels-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .compact-gallery-levels-grid .gallery-level-section { min-width:0; padding:8px; }
+  .compact-gallery-levels-grid .gallery-level-title { font-size:.72rem; line-height:1.15; margin-bottom:7px; overflow-wrap:anywhere; }
+  .compact-gallery-levels-grid .gallery-grid { grid-template-columns:1fr; gap:6px; justify-content:stretch; justify-items:stretch; }
+  .compact-gallery-levels-grid .gallery-image-button { width:100%; max-width:none; }
+  .compact-gallery-levels-grid .gallery-enlarge-hint { font-size:.58rem; line-height:1.2; text-align:center; }
  }
  .gallery-image-button { width:100%; max-width:160px; padding:0; border:1px solid #444; border-radius:4px; background:transparent; cursor:zoom-in; overflow:hidden; line-height:0; }
  .gallery-image-button:hover { border-color:var(--accent); box-shadow:0 0 0 1px rgba(var(--accent-rgb),.18); }
