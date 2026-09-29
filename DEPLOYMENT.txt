@@ -1,0 +1,17 @@
+A.S.S. Profiler 1.4.1 Installable Web App
+
+Upload these alongside the existing files in the GitHub Pages repository:
+- cleanse.html  (replace the existing live cleanse.html)
+- manifest.webmanifest
+- service-worker.js
+- evidence reference icons
+- icons/ folder and all three PNG files
+
+Keep the existing UV_*.webp and Writing_*.webp gallery image files already used by the tool.
+Do not upload this ZIP itself as the web app.
+
+Install behavior:
+- Chrome/Edge: INSTALL appears only when the browser reports the app as installable.
+- After installation, INSTALL hides.
+- If the app is later removed and the browser reports it installable again, INSTALL can return on a future visit.
+- iPhone/iPad: the browser version shows Share > Add to Home Screen instructions; the note hides in standalone/Home Screen mode.
